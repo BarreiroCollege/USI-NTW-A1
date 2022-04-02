@@ -135,6 +135,10 @@ class HttpRequest:
                 raise HttpResponseBadRequest(content="Expecting no request body, but found")
             return
 
+        # Note that PUT method does not strictly require to have a body, nor GET or DELETE are forbidden to
+        # contain such body.
+        # https://stackoverflow.com/questions/1233372/is-an-http-put-request-required-to-include-a-body
+
         # If Content-Length is present, we check if the length of the remaining data matches the specified
         # Content-Length value
         body = "\r\n".join(lines)
@@ -149,7 +153,6 @@ class HttpRequest:
             raise HttpResponseBadRequest(content="Could not parse Content-Length")
 
         if expected_length != actual_length:
-            print(expected_length, actual_length)
             raise HttpResponseBadRequest(content="Request body differs from the specified Content-Length value")
         # And save the body data
         self.__body = body
