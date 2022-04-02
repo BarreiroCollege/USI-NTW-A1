@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from http.enums import HttpResponseCode
 from http.header import HttpHeader
 from settings import HTTP_ENCODING
@@ -19,6 +17,8 @@ class HttpResponseBase:
         return self.__status
 
     def serialize_headers(self):
+        if len(self.__headers) == 0:
+            return ''
         return '\r\n'.join("{}: {}".format(key, value) for key, value in self.__headers.values()) + '\r\n'
 
     def __bytes__(self):
@@ -34,7 +34,7 @@ class HttpResponseBase:
 
     __setitem__ = add_header
 
-    def get_header(self, name: str) -> Any | None:
+    def get_header(self, name: str) -> HttpHeader | None:
         if not self.has_header(name):
             return None
         return self.__headers[name.lower()]
@@ -68,6 +68,9 @@ class HttpResponseError(HttpResponse, RuntimeError):
         if 'status' not in kwargs:
             args += 1
             kwargs['status'] = HttpResponseCode.INTERNAL_SERVER_ERROR
+        if 'content' not in kwargs:
+            args += 1
+            kwargs['content'] = kwargs['status'].get_reason()
         super(HttpResponseError, self).__init__(*args, **kwargs)
 
 

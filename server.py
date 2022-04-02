@@ -6,6 +6,7 @@ import threading
 
 
 # Server Constants
+from http.enums import HttpVersion
 from http.request import HttpRequest
 from http.response import HttpResponse, HttpResponseError
 from settings import DEFAULT_PORT, HTTP_ENCODING
@@ -25,7 +26,6 @@ class Server:
             raise Exception("Socket is not available!")
 
         while True:
-            print("Server waiting to accept connection")
             conn, addr = self.__socket.accept()
             thread = threading.Thread(target=Server.__process_connection, args=(conn, addr))
             thread.start()
@@ -40,14 +40,19 @@ class Server:
 
     @staticmethod
     def __process_connection(conn, addr):
-        print('Serving a connection from host', addr[0], 'on port', addr[1])
+        print('Serving a connection from host {} on port {}'.format(addr[0], addr[1]))
+
+        request, response = None, None
         try:
             request = HttpRequest(conn.recv(1024))
             response = Server.__get_response(request)
         except HttpResponseError as e:
             response = e
-        print(response.get_status_code())
-        conn.send(response.serialize().encode(HTTP_ENCODING))
+
+        out = "{} {}\r\n{}\r\n".format(
+            HttpVersion.HTTP_10 if not request else request.get_http_version(), response.get_status_code(),
+            response.serialize())
+        conn.send(out.encode(HTTP_ENCODING))
         conn.close()
 
 
