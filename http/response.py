@@ -74,21 +74,37 @@ class HttpResponseError(HttpResponse, RuntimeError):
         super(HttpResponseError, self).__init__(*args, **kwargs)
 
 
+# 400
 class HttpResponseBadRequest(HttpResponseError):
     def __init__(self, *args, **kwargs):
         super(HttpResponseBadRequest, self).__init__(status=HttpResponseCode.BAD_REQUEST, *args, **kwargs)
 
 
+# 403
+class HttpResponseForbidden(HttpResponseError):
+    def __init__(self, *args, **kwargs):
+        super(HttpResponseForbidden, self).__init__(status=HttpResponseCode.FORBIDDEN, *args, **kwargs)
+
+
+# 404
+class HttpResponseNotFound(HttpResponseError):
+    def __init__(self, *args, **kwargs):
+        super(HttpResponseNotFound, self).__init__(status=HttpResponseCode.NOT_FOUND, *args, **kwargs)
+
+
+# 405
 class HttpResponseMethodNotAllowed(HttpResponseError):
     def __init__(self, *args, **kwargs):
         super(HttpResponseMethodNotAllowed, self).__init__(status=HttpResponseCode.METHOD_NOT_ALLOWED, *args, **kwargs)
 
 
+# 501
 class HttpResponseNotImplemented(HttpResponseError):
     def __init__(self, *args, **kwargs):
         super(HttpResponseNotImplemented, self).__init__(status=HttpResponseCode.NOT_IMPLEMENTED, *args, **kwargs)
 
 
+# 505
 class HttpResponseHttpVersionNotSupported(HttpResponseError):
     def __init__(self, *args, **kwargs):
         super(HttpResponseHttpVersionNotSupported, self).__init__(status=HttpResponseCode.HTTP_VERSION_NOT_SUPPORTED,
