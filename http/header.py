@@ -1,3 +1,11 @@
+HEADER_HOST = 'Host'
+HEADER_CONNECTION = 'Connection'
+HEADER_CONTENT_LENGTH = 'Content-Length'
+HEADER_CONTENT_LOCATION = 'Content-Location'
+HEADER_CONTENT_TYPE = 'Content-Type'
+HEADER_DATE = 'Date'
+
+
 class HttpHeader:
     """
     Defines a new HTTP header, with the given name and value.
