@@ -39,14 +39,7 @@ class HttpRequest:
         # Then we parse the header lines (which follow right after the request-line)
         c_headers = self.__init_parse_headers(lines[1:])
         # And finally, we parse the body (or we make sure that such body is not present)
-        self.__init_parse_body(lines[(1 + c_headers + 2):])
-        """
-        Explanation of the +2 in the lines subarray:
-        So far, the request has the following format
-        (LAST_HEADER CRLF) CRLF (BODY)?
-        So, the lines list is like [LAST_HEADER, '', 'BODY'?]
-        This means that, if we only add +1, we are into the '' (mandatory CRLF) rather than the start of the body
-        """
+        self.__init_parse_body(lines[(1 + c_headers + 1):])
 
     def __init_parse_requestline(self, lines):
         """
@@ -110,7 +103,7 @@ class HttpRequest:
         """
         count = 0
         found_crlf = False
-        for line in lines[1:]:
+        for line in lines:
             # If line is "blank", it is because it CRLF, so end of headers
             if line == '':
                 found_crlf = True
