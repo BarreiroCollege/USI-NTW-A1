@@ -6,7 +6,7 @@ import threading
 
 
 # Server Constants
-from http.enums import HttpVersion
+from http.enums import HttpVersion, HttpMethod
 from http.request import HttpRequest
 from http.response import HttpResponse, HttpResponseError
 from settings import DEFAULT_PORT, HTTP_ENCODING
@@ -36,7 +36,20 @@ class Server:
 
     @staticmethod
     def __get_response(request: HttpRequest) -> HttpResponse:
-        return HttpResponse()
+        response = HttpResponse()
+        if request.get_method() == HttpMethod.GET:
+            # TODO
+            pass
+        elif request.get_method() == HttpMethod.PUT:
+            # TODO
+            pass
+        elif request.get_method() == HttpMethod.DELETE:
+            # TODO
+            pass
+        elif request.get_method() == HttpMethod.NTW22INFO:
+            # TODO
+            pass
+        return response
 
     @staticmethod
     def __process_connection(conn, addr):
