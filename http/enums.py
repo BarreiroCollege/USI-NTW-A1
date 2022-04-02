@@ -51,6 +51,12 @@ class HttpResponseCode(Enum):
     NOT_IMPLEMENTED = 501, "Not Implemented"
     HTTP_VERSION_NOT_SUPPORTED = 505, "HTTP Version Not Supported"
 
+    def get_code(self) -> int:
+        return self.value[0]
+
+    def get_reason(self) -> str:
+        return self.value[1]
+
     def __str__(self) -> str:
         """
         Given the Enum value, generates a valid HTTP output string based on the RFC.
