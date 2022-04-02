@@ -173,6 +173,9 @@ class HttpRequest:
     def get_headers(self) -> List[HttpHeader]:
         return list(self.__headers.values())
 
+    def get_body(self) -> str | None:
+        return self.__body
+
     def has_header(self, name):
         return name.lower() in self.__headers
 
