@@ -65,8 +65,10 @@ class Server:
 
         request, response = None, None
         try:
-            # Try to parse the request (if not possible, HttpResponseError will catch it)
-            request = HttpRequest(conn.recv(1024), Server.__hosts)
+            # Try to parse the request basic request (if not possible, HttpResponseError will catch it)
+            request = HttpRequest(conn.recv(1024))
+            # Now try with headers and body (but if fails, at least request object will exist)
+            request.parse_request(Server.__hosts)
             # And generate the response based on the request
             response = Server.__get_response(request)
         except HttpResponseError as e:
