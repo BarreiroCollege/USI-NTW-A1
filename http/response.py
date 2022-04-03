@@ -6,6 +6,12 @@ from settings import HTTP_ENCODING
 
 
 class HttpResponse:
+    """
+    Base class for a HTTP response object. Contains the response code (status), the headers and the content
+    (if any).
+    This class can be treated as a dictionary, where the keys are header names and the values are HttpHeader
+    objects.
+    """
     __status = None
     __headers = {}
     __content = None
@@ -13,34 +19,46 @@ class HttpResponse:
     def __init__(self,
                  status: HttpResponseCode = HttpResponseCode.OK,
                  content: str | None = None):
+        # Saves the basic data (inmutable) to the class attributes
         self.__status = status
         self.__content = content
 
     def get_status_code(self):
+        # Returns the status code
         return self.__status
 
-    def has_header(self, name):
+    def has_header(self, name: str):
+        # Check if a given header is present
         return name.lower() in self.__headers
 
+    # Treats the "in" keyword as has_header function with objects of HttpResponse
     __contains__ = has_header
 
-    def add_header(self, key, header: HttpHeader):
+    def add_header(self, key: str, header: HttpHeader):
+        # Saves the specified header into the dictionary of headers
         self.__headers[key.lower()] = header
 
+    # Treats the HttpResponse[HEADER] = VALUE as add_header function with objects of HttpResponse
     __setitem__ = add_header
 
     def get_header(self, name: str) -> HttpHeader | None:
+        # If no header found, return None
         if not self.has_header(name):
             return None
+        # Else return the HttpHeader object
         return self.__headers[name.lower()]
 
+    # Treats the HttpResponse[HEADER] as get_header function with objects of HttpResponse
     __getitem__ = get_header
 
     def del_header(self, name: str):
+        # Do nothing if the header is not present
         if not self.has_header(name):
             return
+        # Else delete the header
         self.__headers.pop(name.lower())
 
+    # Treats the "del" keyword as has_header function with objects of HttpResponse
     __delitem__ = del_header
 
     def get_content(self) -> str | None:
@@ -48,10 +66,14 @@ class HttpResponse:
 
     def serialize_headers(self):
         if len(self.__headers) == 0:
+            # If no headers are present, just return an empty string
             return ''
+        # Else, concatenate all of them with the HTTP format and append \r\n to the last one (join only adds it
+        # in between)
         return '\r\n'.join("{}: {}".format(h.name, h.value) for h in self.__headers.values()) + '\r\n'
 
     def serialize(self):
+        # Convert to string headers with content (if present)
         return self.serialize_headers() + '\r\n' + (self.__content if self.__content is not None else '')
 
     def __bytes__(self):
@@ -59,10 +81,18 @@ class HttpResponse:
 
 
 class HttpResponseError(HttpResponse, RuntimeError):
+    """
+    Specific subclass of HttpResponse which indicates an error has been catched. It extends RuntimeError,
+    so it can be thrown (specifically during the HttpRequest object construction while parsing the
+    request).
+    Then other sub-classes are defined for other response codes.
+    """
     def __init__(self, *args, **kwargs):
+        # If no status is given, use 500 by default
         if 'status' not in kwargs:
             args += 1
             kwargs['status'] = HttpResponseCode.INTERNAL_SERVER_ERROR
+        # If no content is given, get the reason explanation for the code
         if 'content' not in kwargs:
             args += 1
             kwargs['content'] = kwargs['status'].get_reason()
