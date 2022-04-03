@@ -18,7 +18,7 @@ class Server:
 
     def __init__(self, port=DEFAULT_PORT):
         # Parse vhosts.conf file
-        self.__hosts = Vhost.parse_file(VHOSTS_FILE)
+        Server.__hosts = Vhost.parse_file(VHOSTS_FILE)
         # Initialize the socket to work with IPv4 TCP
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Using the specified port
