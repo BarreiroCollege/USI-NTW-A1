@@ -60,7 +60,7 @@ class HttpRequest:
             raise HttpResponseBadRequest(content='Mising Host header')
         elif host.value.lower() not in hosts:
             # Host is not available
-            raise HttpResponseNotFound(content='Host {} is not found'.format(self.get_header(HEADER_HOST)))
+            raise HttpResponseNotFound(content='Host {} is not found'.format(host.value))
         self.__vhost = hosts[host.value.lower()]
 
         # And finally, we parse the body (or we make sure that such body is not present)
