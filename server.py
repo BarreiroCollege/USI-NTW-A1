@@ -10,6 +10,7 @@ from http.enums import HttpVersion, HttpMethod
 from http.request import HttpRequest
 from http.response import HttpResponse, HttpResponseError
 from settings import DEFAULT_PORT, HTTP_ENCODING
+from utils.entity import generate_output
 
 
 class Server:
@@ -62,9 +63,7 @@ class Server:
         except HttpResponseError as e:
             response = e
 
-        out = "{} {}\r\n{}\r\n".format(
-            HttpVersion.HTTP_10 if not request else request.get_http_version(), response.get_status_code(),
-            response.serialize())
+        out = generate_output(request, response)
         conn.send(out.encode(HTTP_ENCODING))
         conn.close()
 

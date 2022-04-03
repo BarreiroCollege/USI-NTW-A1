@@ -1,36 +1,31 @@
 from __future__ import annotations
 
 from http.enums import HttpResponseCode
-from http.header import HttpHeader
+from http.header import HttpHeader, HEADER_CONTENT_LENGTH
 from settings import HTTP_ENCODING
 
 
-class HttpResponseBase:
+class HttpResponse:
     __status = None
     __headers = {}
+    __content = None
 
     def __init__(self,
-                 status: HttpResponseCode = HttpResponseCode.OK):
+                 status: HttpResponseCode = HttpResponseCode.OK,
+                 content: str | None = None):
         self.__status = status
+        self.__content = content
 
     def get_status_code(self):
         return self.__status
-
-    def serialize_headers(self):
-        if len(self.__headers) == 0:
-            return ''
-        return '\r\n'.join("{}: {}".format(key, value) for key, value in self.__headers.values()) + '\r\n'
-
-    def __bytes__(self):
-        return self.serialize_headers().encode(HTTP_ENCODING)
 
     def has_header(self, name):
         return name.lower() in self.__headers
 
     __contains__ = has_header
 
-    def add_header(self, header: HttpHeader):
-        self.__headers[header.name.lower()] = header
+    def add_header(self, key, header: HttpHeader):
+        self.__headers[key.lower()] = header
 
     __setitem__ = add_header
 
@@ -48,16 +43,16 @@ class HttpResponseBase:
 
     __delitem__ = del_header
 
+    def get_content(self) -> str | None:
+        return self.__content
 
-class HttpResponse(HttpResponseBase):
-    __content = None
-
-    def __init__(self, content: str = "", *args, **kwargs):
-        super(HttpResponse, self).__init__(*args, **kwargs)
-        self.__content = content
+    def serialize_headers(self):
+        if len(self.__headers) == 0:
+            return ''
+        return '\r\n'.join("{}: {}".format(h.name, h.value) for h in self.__headers.values()) + '\r\n'
 
     def serialize(self):
-        return self.serialize_headers() + '\r\n' + self.__content
+        return self.serialize_headers() + '\r\n' + (self.__content if self.__content is not None else '')
 
     def __bytes__(self):
         return self.serialize().encode(HTTP_ENCODING)
