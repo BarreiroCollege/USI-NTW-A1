@@ -22,6 +22,7 @@ class HttpRequest:
     __http_version = None
     __headers = {}
     __body = None
+    # TODO: vhost should be here
 
     def __init__(self, raw_bytes: bytes):
         """
