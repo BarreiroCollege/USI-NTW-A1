@@ -90,11 +90,9 @@ class HttpResponseError(HttpResponse, RuntimeError):
     def __init__(self, *args, **kwargs):
         # If no status is given, use 500 by default
         if 'status' not in kwargs:
-            args += 1
             kwargs['status'] = HttpResponseCode.INTERNAL_SERVER_ERROR
         # If no content is given, get the reason explanation for the code
         if 'content' not in kwargs:
-            args += 1
             kwargs['content'] = kwargs['status'].get_reason()
         super(HttpResponseError, self).__init__(*args, **kwargs)
 
