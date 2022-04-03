@@ -1,5 +1,6 @@
 HEADER_HOST = 'Host'
 HEADER_CONNECTION = 'Connection'
+HEADER_CONNECTION_CLOSE = 'close'
 HEADER_CONTENT_LENGTH = 'Content-Length'
 HEADER_CONTENT_LOCATION = 'Content-Location'
 HEADER_CONTENT_TYPE = 'Content-Type'
