@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from http.enums import HttpResponseCode
-from http.header import HttpHeader, HEADER_CONTENT_LENGTH
+from http.header import HttpHeader
 from settings import HTTP_ENCODING
 
 

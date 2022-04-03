@@ -4,8 +4,6 @@ import argparse
 import socket
 import threading
 
-
-# Server Constants
 from http.enums import HttpMethod
 from http.request import HttpRequest
 from http.response import HttpResponse, HttpResponseError
