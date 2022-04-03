@@ -15,21 +15,26 @@ class Server:
     __socket = None
 
     def __init__(self, port=DEFAULT_PORT):
+        # Initialize the socket to work with IPv4 TCP
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # Using the specified port
         self.__socket.bind(('', port))
         self.__socket.listen(1)
         print("Server started on port", port)
 
     def listen(self):
         if self.__socket is None:
+            # Cannot listen if socket is None (probably because it was closed)
             raise Exception("Socket is not available!")
 
         while True:
+            # We listen to connections forever and, for each connection, launch a thread
             conn, addr = self.__socket.accept()
             thread = threading.Thread(target=Server.__process_connection, args=(conn, addr))
             thread.start()
 
     def close(self):
+        # Close and remove the socket
         self.__socket.close()
         self.__socket = None
 
@@ -56,19 +61,25 @@ class Server:
 
         request, response = None, None
         try:
+            # Try to parse the request (if not possible, HttpResponseError will catch it)
             request = HttpRequest(conn.recv(1024))
+            # And generate the response based on the request
             response = Server.__get_response(request)
         except HttpResponseError as e:
             response = e
 
+        # Generate the output based on the request and the repsonse
         out = generate_output(request, response)
+        # Encode it as bytes and send it
         conn.send(out.encode(HTTP_ENCODING))
         conn.close()
 
 
 if __name__ == "__main__":
+    # Initialize the argument parser
     parser = argparse.ArgumentParser(
         description="HTTP server based on TCP IPv4 with multithreading support.")
+    # Accept a custom port number as argument
     parser.add_argument("--port",
                         help="port to use to listen connections",
                         type=int,
@@ -77,7 +88,8 @@ if __name__ == "__main__":
                         default=DEFAULT_PORT)
     args = parser.parse_args()
 
-    server = Server()
+    # Create the server in the specified port (8080 by default) and start listening for connections
     server = Server(port=args.port)
     server.listen()
+    # Close the server after finishing
     server.close()
