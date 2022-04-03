@@ -61,7 +61,7 @@ class Vhost:
         return self.__email
 
     def get_host_root_path(self) -> Path:
-        return Path().parent.absolute().joinpath(self.__hostname)
+        return Path().parent.joinpath(self.__hostname).absolute()
 
     @staticmethod
     def is_secure_path(path: str) -> bool:
