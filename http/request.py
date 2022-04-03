@@ -50,17 +50,17 @@ class HttpRequest:
                 default_hostname = next(iter(hosts))
             except StopIteration:
                 # If no hosts in the file, then error
-                raise HttpResponseNotFound('No hosts availables')
+                raise HttpResponseNotFound(content='No hosts availables')
             self.__headers[HEADER_HOST.lower()] = HttpHeader(HEADER_HOST, default_hostname)
 
         # Try to access the host
         host = self.get_header(HEADER_HOST)
         if not host:
             # Host is missing (HTTP/1.1)
-            raise HttpResponseBadRequest('Mising Host header')
+            raise HttpResponseBadRequest(content='Mising Host header')
         elif host.value.lower() not in hosts:
             # Host is not available
-            raise HttpResponseNotFound('Host {} is not found'.format(self.get_header(HEADER_HOST)))
+            raise HttpResponseNotFound(content='Host {} is not found'.format(self.get_header(HEADER_HOST)))
         self.__vhost = hosts[host.value.lower()]
 
         # And finally, we parse the body (or we make sure that such body is not present)
