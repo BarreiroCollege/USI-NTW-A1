@@ -28,6 +28,7 @@ class Server:
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Using the specified port
         self.__socket.bind(('', port))
+        self.__socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
         self.__socket.listen(1)
         logging.info("Server started on port {}".format(port))
 
