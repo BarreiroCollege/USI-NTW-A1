@@ -38,7 +38,9 @@ class Vhost:
                 hostname, index, name, email = splitted
                 if hostname == "" or index == "" or name == "" or email == "":
                     continue
-                hostname = hostname.lower()
+                # Lowercase host, and remove port number (if present)
+                hostname = hostname.lower().split(":")[0]
+
                 # Check if the specified path for the host exists
                 root_host = root_server.joinpath(hostname)
                 if not root_host.exists() or root_host.is_file():
