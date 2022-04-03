@@ -4,8 +4,10 @@ from typing import List
 
 from http.enums import HttpMethod, HttpVersion
 from http.header import HttpHeader, HEADER_CONTENT_LENGTH
-from http.response import HttpResponseBadRequest, HttpResponseNotImplemented, HttpResponseHttpVersionNotSupported
+from http.response import HttpResponseBadRequest, HttpResponseNotImplemented, HttpResponseHttpVersionNotSupported, \
+    HttpResponseForbidden
 from settings import HTTP_ENCODING
+from utils.vhosts import Vhost
 
 
 class HttpRequest:
@@ -65,7 +67,10 @@ class HttpRequest:
         self.__method = method
 
         # Path is fine, leave as is
-        self.__path = path
+        if path[0] != "/":
+            raise HttpResponseBadRequest(content="Path must be absolute, starting with /")
+        if not Vhost.is_secure_path(path):
+            raise HttpResponseForbidden(content="Trying to access a folder outside the host root")
 
         # Now, try to parse the HTTP version
         http = http_version.split("/")
