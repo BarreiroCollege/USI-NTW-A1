@@ -66,9 +66,10 @@ class HttpRequest:
             raise HttpResponseNotImplemented(content="Method {} is not available".format(method))
         self.__method = method
 
-        # Path is fine, leave as is
+        # Check that path is an absolute URL (proxy-URL is not supported)
         if path[0] != "/":
             raise HttpResponseBadRequest(content="Path must be absolute, starting with /")
+        # Confirm that path is secure (does not try to access outside of host's folder scope)
         if not Vhost.is_secure_path(path):
             raise HttpResponseForbidden(content="Trying to access a folder outside the host root")
 
@@ -177,7 +178,7 @@ class HttpRequest:
     def get_body(self) -> str | None:
         return self.__body
 
-    def has_header(self, name):
+    def has_header(self, name: str):
         return name.lower() in self.__headers
 
     __contains__ = has_header
