@@ -72,6 +72,9 @@ class Server:
         out = generate_output(request, response)
         # Encode it as bytes and send it
         conn.send(out.encode(HTTP_ENCODING))
+        # TODO: For HTTP/1.1, if no Connection header is present or not equal to "Connection: close" (case
+        #  insensitive), this connection can NOT be closed and be open until header "Connection: close" is
+        #  received.
         conn.close()
 
 

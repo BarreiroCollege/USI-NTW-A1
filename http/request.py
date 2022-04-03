@@ -39,8 +39,13 @@ class HttpRequest:
 
         # First we parse the request-line
         self.__init_parse_requestline(lines)
+
         # Then we parse the header lines (which follow right after the request-line)
         c_headers = self.__init_parse_headers(lines[1:])
+
+        # TODO: For HTTP/1.0, if no Host header is present, get the first entry from vhosts.conf
+        # TODO: For HTTP/1.1, the Host header is mandatory
+
         # And finally, we parse the body (or we make sure that such body is not present)
         self.__init_parse_body(lines[(1 + c_headers + 1):])
 
