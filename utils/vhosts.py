@@ -25,3 +25,29 @@ class Vhost:
                 return False
         # If we never left filesystem root folder, it is safe
         return True
+
+
+
+# check if the header 'Host' exists in vhosts.conf
+def host_exists(vhost_name):
+    #this is a header
+
+    with open("../vhosts.conf") as f:
+        host_lines = f.readlines()
+
+        for line in host_lines:
+            current_line = line.split(",")
+            current_name = current_line[0]
+            if current_name == vhost_name:
+                return True
+
+
+def get_recource(vhost_name, resource_path):
+    path = "../{}/{}".format(vhost_name,resource_path)
+    try:
+        with open(path) as f:
+            return f
+            
+
+    except FileNotFoundError:
+        return None

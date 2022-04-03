@@ -3,12 +3,17 @@
 import argparse
 import socket
 import threading
+import os
+import mimetypes
 
 from http.enums import HttpMethod
 from http.request import HttpRequest
-from http.response import HttpResponse, HttpResponseError
+from http.response import HttpResponse, HttpResponseBadRequest, HttpResponseError, HttpResponseNotFound
 from settings import DEFAULT_PORT, HTTP_ENCODING
 from utils.entity import generate_output
+from utils.vhosts import get_recource, host_exists
+
+from http.header import HttpHeader
 
 
 class Server:
@@ -41,9 +46,31 @@ class Server:
     @staticmethod
     def __get_response(request: HttpRequest) -> HttpResponse:
         response = HttpResponse()
+        
+        request_headers = request.get_headers() 
+        vhost_name = ""
+        
         if request.get_method() == HttpMethod.GET:
-            # TODO
-            pass
+            # search for the resource
+            # get host header
+            vhost_name = request["Host"]
+            if not host_exists(vhost_name):
+                raise HttpResponseNotFound(content="Host name not found")
+            
+            path = request.get_path()
+            resource_file = get_recource(vhost_name, path)
+
+            if resource_file == None:
+                raise HttpResponseNotFound(content="Path: {} not found".format(path))
+
+            _, extension = os.path.splitext(path)
+            content_type_header = HttpHeader("Content-Type", d_type[extension])
+            response.add_header(content_type_header)
+
+
+
+            # if host_exists(request)
+
         elif request.get_method() == HttpMethod.PUT:
             # TODO
             pass
