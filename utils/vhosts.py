@@ -1,4 +1,68 @@
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Dict
+
+from settings import VHOSTS_FILE
+
+
 class Vhost:
+    __hostname = None
+    __index = None
+    __name = None
+    __email = None
+
+    def __init__(self, hostname: str, index: str, name: str, email: str):
+        self.__hostname = hostname
+        self.__index = index
+        self.__name = name
+        self.__email = email
+
+    @staticmethod
+    def parse_file(file: str = VHOSTS_FILE) -> Dict[str, Vhost]:
+        out = {}
+        # Get the root of the server
+        root_server = Path().parent
+        # Open the file from the root of the server
+        with open(root_server.joinpath(file).absolute(), 'r') as f:
+            for line in f.readlines():
+                # Start parsing the virtual host line and, if any error appears, discard the line
+                line = line.strip()
+                if line == "":
+                    continue
+                # Line should have 4 items
+                splitted = [e.strip() for e in line.split(",")]
+                if len(splitted) != 4:
+                    continue
+                # If any element is empty, discard
+                hostname, index, name, email = splitted
+                if hostname == "" or index == "" or name == "" or email == "":
+                    continue
+                hostname = hostname.lower()
+                # Check if the specified path for the host exists
+                root_host = root_server.joinpath(hostname)
+                if not root_host.exists() or root_host.is_file():
+                    continue
+                # Create the Vhost and add it
+                vhost = Vhost(hostname, index, name, email)
+                out[hostname] = vhost
+        return out
+
+    def get_hostname(self) -> str:
+        return self.__hostname
+
+    def get_index_file(self) -> str:
+        return self.__index
+
+    def get_server_admin_name(self) -> str:
+        return self.__name
+
+    def get_server_admin_email(self) -> str:
+        return self.__email
+
+    def get_host_root_path(self) -> Path:
+        return Path().parent.absolute().joinpath(self.__hostname)
+
     @staticmethod
     def is_secure_path(path: str) -> bool:
         """
@@ -25,3 +89,6 @@ class Vhost:
                 return False
         # If we never left filesystem root folder, it is safe
         return True
+
+    def __str__(self) -> str:
+        return "{}({})".format(self.__hostname, self.__email)
