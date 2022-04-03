@@ -43,6 +43,10 @@ class Vhost:
                 root_host = root_server.joinpath(hostname)
                 if not root_host.exists() or root_host.is_file():
                     continue
+                # Check if the root file exists
+                root_file = root_host.joinpath(name)
+                if not root_file.exists() or not root_file.is_file():
+                    continue
                 # Create the Vhost and add it
                 vhost = Vhost(hostname, index, name, email)
                 out[hostname] = vhost
