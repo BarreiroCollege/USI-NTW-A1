@@ -71,7 +71,7 @@ def generate_output(request: HttpRequest | None, response: HttpResponse) -> str:
         # If we receive a valid request, then try to generate the needed headers automatically
         generate_auto_headers(request, response)
     # Generate the response-line and append the response serialization (headers and body) afterwards
-    return "{} {}\r\n{}\r\n".format(
+    return "{} {}\r\n{}".format(
         HttpVersion.HTTP_10 if not request else request.get_http_version(), response.get_status_code(),
         response.serialize()
     )
