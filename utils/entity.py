@@ -16,8 +16,9 @@ def generate_header_date(response: HttpResponse):
 
 
 def generate_header_content_length(response: HttpResponse):
-    length = len(response.get_content()) if response.get_content() is not None else 0
-    header = HttpHeader(name=HEADER_CONTENT_LENGTH, value=str(length))
+    if response.get_content() is None:
+        return
+    header = HttpHeader(name=HEADER_CONTENT_LENGTH, value=str(len(response.get_content())))
     response[HEADER_CONTENT_LENGTH] = header
 
 
