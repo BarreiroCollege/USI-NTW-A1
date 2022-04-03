@@ -6,7 +6,7 @@ import threading
 
 
 # Server Constants
-from http.enums import HttpVersion, HttpMethod
+from http.enums import HttpMethod
 from http.request import HttpRequest
 from http.response import HttpResponse, HttpResponseError
 from settings import DEFAULT_PORT, HTTP_ENCODING
