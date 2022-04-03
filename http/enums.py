@@ -9,6 +9,7 @@ class HttpVersion(Enum):
     Currently supported HTTP versions in the server.
     """
     HTTP_10 = "HTTP/1.0"
+    HTTP_11 = "HTTP/1.1"
 
     def __str__(self):
         """
