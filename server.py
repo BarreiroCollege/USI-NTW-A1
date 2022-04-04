@@ -9,17 +9,20 @@ import mimetypes
 from http.enums import HttpMethod
 from http.request import HttpRequest
 from http.response import HttpResponse, HttpResponseBadRequest, HttpResponseError, HttpResponseNotFound
-from settings import DEFAULT_PORT, HTTP_ENCODING
+from settings import DEFAULT_PORT, HTTP_ENCODING, VHOSTS_FILE
 from utils.entity import generate_output
-from utils.vhosts import get_recource, host_exists
+from utils.vhosts import Vhost
 
 from http.header import HttpHeader
 
 
 class Server:
     __socket = None
+    __hosts = None
 
     def __init__(self, port=DEFAULT_PORT):
+        # Parse vhosts.conf file
+        Server.__hosts = Vhost.parse_file(VHOSTS_FILE)
         # Initialize the socket to work with IPv4 TCP
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Using the specified port
@@ -88,8 +91,10 @@ class Server:
 
         request, response = None, None
         try:
-            # Try to parse the request (if not possible, HttpResponseError will catch it)
+            # Try to parse the request basic request (if not possible, HttpResponseError will catch it)
             request = HttpRequest(conn.recv(1024))
+            # Now try with headers and body (but if fails, at least request object will exist)
+            request.parse_request(Server.__hosts)
             # And generate the response based on the request
             response = Server.__get_response(request)
         except HttpResponseError as e:

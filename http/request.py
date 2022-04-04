@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import List
+from typing import List, Dict
 
 from http.enums import HttpMethod, HttpVersion
-from http.header import HttpHeader, HEADER_CONTENT_LENGTH
+from http.header import HttpHeader, HEADER_CONTENT_LENGTH, HEADER_HOST
 from http.response import HttpResponseBadRequest, HttpResponseNotImplemented, HttpResponseHttpVersionNotSupported, \
-    HttpResponseForbidden
+    HttpResponseForbidden, HttpResponseNotFound
 from settings import HTTP_ENCODING
 from utils.vhosts import Vhost
 
@@ -17,12 +17,14 @@ class HttpRequest:
     Constructing the class will throw HttpResponseError with further information on why the request is not
     valid.
     """
+    # Note this lines variable is only used internally
+    __lines = None
     __method = None
     __path = None
     __http_version = None
     __headers = {}
     __body = None
-    # TODO: vhost should be here
+    __vhost = None
 
     def __init__(self, raw_bytes: bytes):
         """
@@ -33,21 +35,17 @@ class HttpRequest:
             raise HttpResponseBadRequest(content="No data found to be parsed")
 
         raw_data = raw_bytes.decode(HTTP_ENCODING)
-        lines = raw_data.split("\r\n")
-        if len(lines) == 0:
+        self.__lines = raw_data.split("\r\n")
+        if len(self.__lines) == 0:
             raise HttpResponseBadRequest(content="No data found")
 
         # First we parse the request-line
-        self.__init_parse_requestline(lines)
+        self.__init_parse_requestline(self.__lines)
 
-        # Then we parse the header lines (which follow right after the request-line)
-        c_headers = self.__init_parse_headers(lines[1:])
-
-        # TODO: For HTTP/1.0, if no Host header is present, get the first entry from vhosts.conf
-        # TODO: For HTTP/1.1, the Host header is mandatory
-
-        # And finally, we parse the body (or we make sure that such body is not present)
-        self.__init_parse_body(lines[(1 + c_headers + 1):])
+        # NOTE: To generate the HttpRequest object, only the request-line is needed. Once finished
+        #       generating the object, we can proceed to parse the rest of the request.
+        #       This is done as such so, in case of errors in the headers or when generating the response,
+        #       we can appropiately indicate headers and other HTTP data at a later stage.
 
     def __init_parse_requestline(self, lines):
         """
@@ -106,6 +104,48 @@ class HttpRequest:
             # If http_version is still a string, we do not support such version
             raise HttpResponseHttpVersionNotSupported(content="HTTP version {} is not available".format(http_version))
         self.__http_version = http_version
+
+    def parse_request(self, hosts: Dict[str, Vhost]):
+        """
+        Method that finishes parsing the raw request. Can only be invoked once, and must be invoked right after
+        constructing the object. It will get the remaining lines to be parsed, and extract both headers and
+        request body.
+        :param hosts: dictionary of available hosts in the server
+        """
+        # If lines is None, we have already parsed the request
+        if self.__lines is None:
+            return
+
+        # Then we parse the header lines (which follow right after the request-line)
+        c_headers = self.__init_parse_headers(self.__lines[1:])
+
+        # For HTTP/1.0, if no Host header is present, add it with the first entry (dictionaries in Python 3.6+
+        # are ordered)
+        if self.__http_version == HttpVersion.HTTP_10 and not self.has_header(HEADER_HOST):
+            try:
+                default_hostname = next(iter(hosts))
+            except StopIteration:
+                # If no hosts in the file, then error
+                raise HttpResponseNotFound(content='No hosts availables')
+            self.__headers[HEADER_HOST.lower()] = HttpHeader(HEADER_HOST, default_hostname)
+
+        # Try to access the host
+        host = self.get_header(HEADER_HOST)
+        if not host:
+            # Host is missing (HTTP/1.1)
+            raise HttpResponseBadRequest(content='Mising Host header')
+        # Remove port from Host header
+        host.value = host.value.split(":")[0]
+        if host.value.lower() not in hosts:
+            # Host is not available
+            raise HttpResponseNotFound(content='Host {} is not found'.format(host.value))
+        self.__vhost = hosts[host.value.lower()]
+
+        # And finally, we parse the body (or we make sure that such body is not present)
+        self.__init_parse_body(self.__lines[(1 + c_headers + 1):])
+
+        # And indicate that request has been parsed already
+        self.__lines = None
 
     def __init_parse_headers(self, lines):
         """
@@ -180,6 +220,9 @@ class HttpRequest:
 
     def get_headers(self) -> List[HttpHeader]:
         return list(self.__headers.values())
+
+    def get_vhost(self) -> Vhost:
+        return self.__vhost
 
     def get_body(self) -> str | None:
         return self.__body
