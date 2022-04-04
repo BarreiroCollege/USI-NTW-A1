@@ -6,13 +6,12 @@ import socket
 import threading
 
 from http.enums import HttpMethod
+from http.header import HttpHeader, HEADER_CONTENT_TYPE
 from http.request import HttpRequest
 from http.response import HttpResponse, HttpResponseError, HttpResponseMethodNotAllowed, HttpResponseNotFound
 from settings import DEFAULT_PORT, HTTP_ENCODING, VHOSTS_FILE
 from utils.entity import generate_output
 from utils.vhosts import Vhost
-
-from http.header import HttpHeader, HEADER_CONTENT_TYPE
 
 
 class Server:
@@ -51,14 +50,11 @@ class Server:
         
         if request.get_method() == HttpMethod.GET:
             file_path = request.get_vhost().get_host_root_path().joinpath(request.get_path())
-            if request.get_path().endswith("/"):
+            if not file_path.is_file():
                 file_path = file_path.joinpath(request.get_vhost().get_index_file())
 
             if not file_path.exists():
                 raise HttpResponseNotFound(content="File not found")
-            
-            if not file_path.is_file():
-                raise HttpResponseMethodNotAllowed()
 
             content = Vhost.get_file_contents(file_path)
             response = HttpResponse(content=content)

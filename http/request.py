@@ -76,6 +76,7 @@ class HttpRequest:
         # Confirm that path is secure (does not try to access outside of host's folder scope)
         if not Vhost.is_secure_path(path):
             raise HttpResponseForbidden(content="Trying to access a folder outside the host root")
+        self.__path = path[1:]
 
         # Now, try to parse the HTTP version
         http = http_version.split("/")
