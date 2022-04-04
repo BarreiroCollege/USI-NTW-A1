@@ -22,6 +22,7 @@ class HttpResponse:
         # Saves the basic data (inmutable) to the class attributes
         self.__status = status
         self.__content = content
+        self.__headers = {}
 
     def get_status_code(self):
         # Returns the status code

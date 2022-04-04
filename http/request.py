@@ -19,9 +19,7 @@ class HttpRequest:
     """
     # Note this lines variable is only used internally
     __lines = None
-    __method = None
-    __path = None
-    __http_version = None
+    __method, __path, __http_version = None, None, None
     __headers = {}
     __body = None
     __vhost = None
@@ -46,6 +44,11 @@ class HttpRequest:
         #       generating the object, we can proceed to parse the rest of the request.
         #       This is done as such so, in case of errors in the headers or when generating the response,
         #       we can appropiately indicate headers and other HTTP data at a later stage.
+
+        # Reset the rest of the fields
+        self.__headers = {}
+        self.__body = None
+        self.__vhost = None
 
     def __init_parse_requestline(self, lines):
         """
