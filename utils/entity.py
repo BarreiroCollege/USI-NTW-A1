@@ -8,6 +8,7 @@ from http.header import HttpHeader, HEADER_DATE, HEADER_CONTENT_LENGTH, HEADER_S
 from http.request import HttpRequest
 from http.response import HttpResponse
 from settings import SERVER_NAME
+from settings import HTTP_ENCODING
 
 
 def generate_header_server(response: HttpResponse):
@@ -39,7 +40,10 @@ def generate_header_content_length(response: HttpResponse):
         # If no content, we ignore this header
         return
     # Otherwise, get the size of the contents and append it as header
-    header = HttpHeader(name=HEADER_CONTENT_LENGTH, value=str(len(response.get_content())))
+    v = response.get_content()
+    if isinstance(response.get_content(), str):
+        v = response.get_content().encode(HTTP_ENCODING)
+    header = HttpHeader(name=HEADER_CONTENT_LENGTH, value=str(len(v)))
     response[HEADER_CONTENT_LENGTH] = header
 
 
@@ -70,7 +74,7 @@ def generate_auto_headers(request: HttpRequest, response: HttpResponse):
         # TODO: Content-Type
 
 
-def generate_output(request: HttpRequest | None, response: HttpResponse) -> str:
+def generate_output(request: HttpRequest | None, response: HttpResponse) -> bytes:
     """
     Given a request object and a response, generates the corresponding HTTP responding as a string.
     :param request: original request from the client
@@ -81,7 +85,5 @@ def generate_output(request: HttpRequest | None, response: HttpResponse) -> str:
         # If we receive a valid request, then try to generate the needed headers automatically
         generate_auto_headers(request, response)
     # Generate the response-line and append the response serialization (headers and body) afterwards
-    return "{} {}\r\n{}".format(
-        HttpVersion.HTTP_10 if not request else request.get_http_version(), response.get_status_code(),
-        response.serialize()
-    )
+    return "{} {}\r\n".format(HttpVersion.HTTP_10 if not request else request.get_http_version(),
+                              response.get_status_code()).encode(HTTP_ENCODING) + bytes(response)
