@@ -6,6 +6,8 @@ import mimetypes
 import socket
 import threading
 
+from http.enums import HttpMethod, HttpVersion
+from http.header import HttpHeader, HEADER_CONTENT_TYPE, HEADER_CONNECTION, HEADER_CONNECTION_CLOSE
 from http.enums import HttpMethod
 from http.header import HttpHeader, HEADER_CONTENT_TYPE
 from http.header import HEADER_CONNECTION, HEADER_CONNECTION_CLOSE
