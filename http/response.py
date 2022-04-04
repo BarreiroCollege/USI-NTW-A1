@@ -74,10 +74,16 @@ class HttpResponse:
 
     def serialize(self):
         # Convert to string headers with content (if present)
-        return self.serialize_headers() + '\r\n' + (self.__content if self.__content is not None else '')
+        return self.serialize_headers() + '\r\n' + (str(self.__content) if self.__content is not None else '')
 
     def __bytes__(self):
-        return self.serialize().encode(HTTP_ENCODING)
+        out = (self.serialize_headers() + '\r\n').encode(HTTP_ENCODING)
+        if self.__content is not None:
+            content = self.__content
+            if isinstance(self.__content, str):
+                content = content.encode(HTTP_ENCODING)
+            out += content
+        return out
 
 
 class HttpResponseError(HttpResponse, RuntimeError):

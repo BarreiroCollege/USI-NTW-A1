@@ -7,7 +7,7 @@ import threading
 from http.enums import HttpMethod
 from http.request import HttpRequest
 from http.response import HttpResponse, HttpResponseError
-from settings import DEFAULT_PORT, HTTP_ENCODING, VHOSTS_FILE
+from settings import DEFAULT_PORT, VHOSTS_FILE
 from utils.entity import generate_output
 from utils.vhosts import Vhost
 
@@ -77,7 +77,7 @@ class Server:
         # Generate the output based on the request and the repsonse
         out = generate_output(request, response)
         # Encode it as bytes and send it
-        conn.send(out.encode(HTTP_ENCODING))
+        conn.send(bytes(out))
         # TODO: For HTTP/1.1, if no Connection header is present or not equal to "Connection: close" (case
         #  insensitive), this connection can NOT be closed and be open until header "Connection: close" is
         #  received.
