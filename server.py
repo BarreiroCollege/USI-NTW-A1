@@ -8,7 +8,7 @@ import threading
 from http.enums import HttpMethod
 from http.header import HttpHeader, HEADER_CONTENT_TYPE
 from http.request import HttpRequest
-from http.response import HttpResponse, HttpResponseError, HttpResponseMethodNotAllowed, HttpResponseNotFound
+from http.response import HttpResponse, HttpResponseError, HttpResponseNotFound
 from settings import DEFAULT_PORT, VHOSTS_FILE
 from utils.entity import generate_output
 from utils.vhosts import Vhost
@@ -47,7 +47,7 @@ class Server:
     @staticmethod
     def __get_response(request: HttpRequest) -> HttpResponse:
         response = HttpResponse()
-        
+
         if request.get_method() == HttpMethod.GET:
             file_path = request.get_vhost().get_host_root_path().joinpath(request.get_path())
             if not file_path.is_file():

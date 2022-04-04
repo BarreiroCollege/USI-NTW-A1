@@ -7,8 +7,7 @@ from http.enums import HttpVersion, HttpMethod
 from http.header import HttpHeader, HEADER_DATE, HEADER_CONTENT_LENGTH, HEADER_SERVER
 from http.request import HttpRequest
 from http.response import HttpResponse
-from settings import SERVER_NAME
-from settings import HTTP_ENCODING
+from settings import HTTP_ENCODING, SERVER_NAME
 
 
 def generate_header_server(response: HttpResponse):
