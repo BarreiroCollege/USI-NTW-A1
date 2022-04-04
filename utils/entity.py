@@ -4,9 +4,19 @@ import datetime
 import locale
 
 from http.enums import HttpVersion, HttpMethod
-from http.header import HttpHeader, HEADER_DATE, HEADER_CONTENT_LENGTH
+from http.header import HttpHeader, HEADER_DATE, HEADER_CONTENT_LENGTH, HEADER_SERVER
 from http.request import HttpRequest
 from http.response import HttpResponse
+from settings import SERVER_NAME
+
+
+def generate_header_server(response: HttpResponse):
+    """
+    Given a response, appends the Server header.
+    :param response: response object where the Server header will be added
+    """
+    header = HttpHeader(HEADER_SERVER, SERVER_NAME)
+    response[HEADER_SERVER] = header
 
 
 def generate_header_date(response: HttpResponse):
@@ -40,12 +50,12 @@ def generate_auto_headers(request: HttpRequest, response: HttpResponse):
     :param response: response object to be modified
     """
     # Server header is used in all methods
-    # TODO: Server
+    generate_header_server(response)
     if request.get_method() == HttpMethod.GET:
         # We need Date, Content-Length and Content-Type
         generate_header_date(response)
         generate_header_content_length(response)
-        # TODO: Content-Type
+        # Content-Type is generated at server.py
     elif request.get_method() == HttpMethod.PUT:
         # We need Content-Location
         # TODO: Content-Location

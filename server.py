@@ -1,19 +1,18 @@
 #!/usr/bin/python3
 
 import argparse
+import mimetypes
 import socket
 import threading
-import os
-import mimetypes
 
 from http.enums import HttpMethod
 from http.request import HttpRequest
-from http.response import HttpResponse, HttpResponseBadRequest, HttpResponseError, HttpResponseNotFound
+from http.response import HttpResponse, HttpResponseError, HttpResponseMethodNotAllowed, HttpResponseNotFound
 from settings import DEFAULT_PORT, HTTP_ENCODING, VHOSTS_FILE
 from utils.entity import generate_output
 from utils.vhosts import Vhost
 
-from http.header import HttpHeader
+from http.header import HttpHeader, HEADER_CONTENT_TYPE
 
 
 class Server:
@@ -50,29 +49,27 @@ class Server:
     def __get_response(request: HttpRequest) -> HttpResponse:
         response = HttpResponse()
         
-        request_headers = request.get_headers() 
-        vhost_name = ""
-        
         if request.get_method() == HttpMethod.GET:
-            # search for the resource
-            # get host header
-            vhost_name = request["Host"]
-            if not host_exists(vhost_name):
-                raise HttpResponseNotFound(content="Host name not found")
+            file_path = request.get_vhost().get_host_root_path().joinpath(request.get_path())
+            if request.get_path().endswith("/"):
+                file_path = file_path.joinpath(request.get_vhost().get_index_file())
+
+            if not file_path.exists():
+                raise HttpResponseNotFound(content="File not found")
             
-            path = request.get_path()
-            resource_file = get_recource(vhost_name, path)
+            if not file_path.is_file():
+                raise HttpResponseMethodNotAllowed()
 
-            if resource_file == None:
-                raise HttpResponseNotFound(content="Path: {} not found".format(path))
+            content = Vhost.get_file_contents(file_path)
+            response = HttpResponse(content=content)
 
-            _, extension = os.path.splitext(path)
-            content_type_header = HttpHeader("Content-Type", d_type[extension])
+            content_type = mimetypes.guess_type(file_path)[0]
+            # TODO: confirm this            
+            if content_type == None:
+                content_type = "plain/text"
+
+            content_type_header = HttpHeader(HEADER_CONTENT_TYPE, content_type)
             response.add_header(content_type_header)
-
-
-
-            # if host_exists(request)
 
         elif request.get_method() == HttpMethod.PUT:
             # TODO

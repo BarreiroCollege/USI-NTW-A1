@@ -5,6 +5,7 @@ HEADER_CONTENT_LENGTH = 'Content-Length'
 HEADER_CONTENT_LOCATION = 'Content-Location'
 HEADER_CONTENT_TYPE = 'Content-Type'
 HEADER_DATE = 'Date'
+HEADER_SERVER = 'Server'
 
 
 class HttpHeader:
