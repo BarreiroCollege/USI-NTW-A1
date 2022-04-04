@@ -65,11 +65,11 @@ class Server:
 
             content_type = mimetypes.guess_type(file_path)[0]
             # TODO: confirm this            
-            if content_type == None:
+            if content_type is None:
                 content_type = "plain/text"
 
             content_type_header = HttpHeader(HEADER_CONTENT_TYPE, content_type)
-            response.add_header(content_type_header)
+            response.add_header(HEADER_CONTENT_TYPE, content_type_header)
 
         elif request.get_method() == HttpMethod.PUT:
             # TODO
