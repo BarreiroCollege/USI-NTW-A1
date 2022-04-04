@@ -1,12 +1,14 @@
 #!/usr/bin/python3
 
 import argparse
+import mimetypes
 import socket
 import threading
 
 from http.enums import HttpMethod
+from http.header import HttpHeader, HEADER_CONTENT_TYPE
 from http.request import HttpRequest
-from http.response import HttpResponse, HttpResponseError
+from http.response import HttpResponse, HttpResponseError, HttpResponseNotFound
 from settings import DEFAULT_PORT, VHOSTS_FILE
 from utils.entity import generate_output
 from utils.vhosts import Vhost
@@ -45,9 +47,26 @@ class Server:
     @staticmethod
     def __get_response(request: HttpRequest) -> HttpResponse:
         response = HttpResponse()
+
         if request.get_method() == HttpMethod.GET:
-            # TODO
-            pass
+            file_path = request.get_vhost().get_host_root_path().joinpath(request.get_path())
+            if not file_path.is_file():
+                file_path = file_path.joinpath(request.get_vhost().get_index_file())
+
+            if not file_path.exists():
+                raise HttpResponseNotFound(content="File not found")
+
+            content = Vhost.get_file_contents(file_path)
+            response = HttpResponse(content=content)
+
+            content_type = mimetypes.guess_type(file_path)[0]
+            # TODO: confirm this            
+            if content_type is None:
+                content_type = "plain/text"
+
+            content_type_header = HttpHeader(HEADER_CONTENT_TYPE, content_type)
+            response.add_header(HEADER_CONTENT_TYPE, content_type_header)
+
         elif request.get_method() == HttpMethod.PUT:
             # TODO
             pass

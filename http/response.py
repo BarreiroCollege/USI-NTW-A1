@@ -18,7 +18,7 @@ class HttpResponse:
 
     def __init__(self,
                  status: HttpResponseCode = HttpResponseCode.OK,
-                 content: str | None = None):
+                 content: str | bytes | None = None):
         # Saves the basic data (inmutable) to the class attributes
         self.__status = status
         self.__content = content
@@ -62,7 +62,7 @@ class HttpResponse:
     # Treats the "del" keyword as has_header function with objects of HttpResponse
     __delitem__ = del_header
 
-    def get_content(self) -> str | None:
+    def get_content(self) -> str | bytes | None:
         return self.__content
 
     def serialize_headers(self):

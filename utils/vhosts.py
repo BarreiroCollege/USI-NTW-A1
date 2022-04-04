@@ -6,6 +6,9 @@ from typing import Dict
 from settings import VHOSTS_FILE
 
 
+from http.response import HttpResponseNotFound, HttpResponseForbidden
+
+
 class Vhost:
     __hostname = None
     __index = None
@@ -97,3 +100,13 @@ class Vhost:
 
     def __str__(self) -> str:
         return "{}({})".format(self.__hostname, self.__email)
+
+    @staticmethod
+    def get_file_contents(path: Path) -> str:
+        try:
+            with open(path, mode='rb') as f:
+                return f.read()        
+        except FileNotFoundError:
+            raise HttpResponseNotFound()
+        except PermissionError:
+            raise HttpResponseForbidden()
