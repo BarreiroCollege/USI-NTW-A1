@@ -8,7 +8,7 @@ import threading
 from http.enums import HttpMethod
 from http.header import HttpHeader, HEADER_CONTENT_TYPE
 from http.request import HttpRequest
-from http.response import HttpResponse, HttpResponseError, HttpResponseNotFound
+from http.response import HttpResponse, HttpResponseError, HttpResponseNotFound, HttpResponseUnsupportedMediaType
 from settings import DEFAULT_PORT, VHOSTS_FILE
 from utils.entity import generate_output
 from utils.vhosts import Vhost
@@ -60,9 +60,8 @@ class Server:
             response = HttpResponse(content=content)
 
             content_type = mimetypes.guess_type(file_path)[0]
-            # TODO: confirm this
             if content_type is None:
-                content_type = "plain/text"
+                raise HttpResponseUnsupportedMediaType()
 
             content_type_header = HttpHeader(HEADER_CONTENT_TYPE, content_type)
             response.add_header(HEADER_CONTENT_TYPE, content_type_header)
