@@ -60,7 +60,7 @@ class Server:
             response = HttpResponse(content=content)
 
             content_type = mimetypes.guess_type(file_path)[0]
-            # TODO: confirm this            
+            # TODO: confirm this
             if content_type is None:
                 content_type = "plain/text"
 
