@@ -108,7 +108,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="HTTP server based on TCP IPv4 with multithreading support.")
     # Accept a custom port number as argument
-    parser.add_argument("--port",
+    parser.add_argument("-p", "--port",
                         help="port to use to listen connections",
                         type=int,
                         nargs='?',
