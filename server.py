@@ -6,7 +6,7 @@ import socket
 import threading
 
 from http.enums import HttpMethod
-from http.header import HttpHeader, HEADER_CONTENT_TYPE
+from http.header import HttpHeader, HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_TEXT_PLAIN
 from http.request import HttpRequest
 from http.response import HttpResponse, HttpResponseError, HttpResponseNotFound, HttpResponseUnsupportedMediaType
 from settings import DEFAULT_PORT, VHOSTS_FILE
@@ -73,8 +73,17 @@ class Server:
             # TODO
             pass
         elif request.get_method() == HttpMethod.NTW22INFO:
-            # TODO
-            pass
+            ntw = "The administator of {} is {}.\nYou can contact him at {}.".format(
+                request.get_vhost().get_hostname(),
+                request.get_vhost().get_server_admin_name(),
+                request.get_vhost().get_server_admin_email()
+            )
+
+            response = HttpResponse(content=ntw)
+
+            content_type_header = HttpHeader(HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_TEXT_PLAIN)
+            response.add_header(HEADER_CONTENT_TYPE, content_type_header)
+
         return response
 
     @staticmethod
