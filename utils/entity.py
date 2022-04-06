@@ -70,7 +70,7 @@ def generate_auto_headers(request: HttpRequest, response: HttpResponse):
         # We need Date, Content-Length and Content-Type
         generate_header_date(response)
         generate_header_content_length(response)
-        # TODO: Content-Type
+        # Content-Type is generated at server.py
 
 
 def generate_output(request: HttpRequest | None, response: HttpResponse) -> bytes:
