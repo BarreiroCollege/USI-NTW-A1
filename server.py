@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import argparse
+import logging
 import mimetypes
 import socket
 import threading
@@ -26,7 +27,7 @@ class Server:
         # Using the specified port
         self.__socket.bind(('', port))
         self.__socket.listen(1)
-        print("Server started on port", port)
+        logging.info("Server started on port {}".format(port))
 
     def listen(self):
         if self.__socket is None:
@@ -88,7 +89,7 @@ class Server:
 
     @staticmethod
     def __process_connection(conn, addr):
-        print('Serving a connection from host {} on port {}'.format(addr[0], addr[1]))
+        logging.debug('Serving a connection from host {} on port {}'.format(addr[0], addr[1]))
 
         request, response = None, None
         try:
@@ -112,6 +113,11 @@ class Server:
 
 
 if __name__ == "__main__":
+    # Define logging format
+    logging.basicConfig(format='%(asctime)s | %(message)s')
+    # And output all logging messages
+    logging.getLogger().setLevel(logging.DEBUG)
+
     # Initialize the argument parser
     parser = argparse.ArgumentParser(
         description="HTTP server based on TCP IPv4 with multithreading support.")
