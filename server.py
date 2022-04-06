@@ -3,14 +3,16 @@
 import argparse
 import logging
 import mimetypes
+import os
 import socket
 import threading
 
-from http.enums import HttpMethod, HttpVersion
-from http.header import HttpHeader, HEADER_CONNECTION, HEADER_CONNECTION_CLOSE, HEADER_CONTENT_TYPE, \
-    HEADER_CONTENT_TYPE_TEXT_PLAIN
+from http.enums import HttpMethod, HttpResponseCode, HttpVersion
+from http.header import HttpHeader, HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_TEXT_PLAIN, HEADER_CONNECTION, \
+    HEADER_CONNECTION_CLOSE
 from http.request import HttpRequest
-from http.response import HttpResponse, HttpResponseError, HttpResponseMethodNotAllowed, HttpResponseNotFound, HttpResponseUnsupportedMediaType
+from http.response import HttpResponse, HttpResponseError, HttpResponseNotFound, HttpResponseUnsupportedMediaType, \
+    HttpResponseForbidden, HttpResponseMethodNotAllowed
 from settings import DEFAULT_PORT, VHOSTS_FILE
 from utils.entity import generate_output
 from utils.mime import CUSTOM_MIMETYPES
@@ -76,8 +78,17 @@ class Server:
             response.add_header(HEADER_CONTENT_TYPE, content_type_header)
 
         elif request.get_method() == HttpMethod.PUT:
-            # TODO
-            pass
+            file_path = request.get_vhost().get_host_root_path().joinpath(request.get_path())
+            print(file_path.is_file())
+            try:
+                os.makedirs(file_path, exist_ok=True)
+                with open(file_path, "w") as f:
+                    f.write(request.get_body())
+            except PermissionError:
+                raise HttpResponseForbidden()
+
+            response = HttpResponse(status=HttpResponseCode.CREATED)
+
         elif request.get_method() == HttpMethod.DELETE:
             file_path = request.get_vhost().get_host_root_path().joinpath(request.get_path())
             if not file_path.exists():
