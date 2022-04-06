@@ -110,3 +110,25 @@ class Vhost:
             raise HttpResponseNotFound()
         except PermissionError:
             raise HttpResponseForbidden()
+    
+    
+    @staticmethod
+    def delete_file(path: Path, root: Path) -> str:
+        """
+        deletes the file and then deletes the folder
+        and its parents only if they are empty
+        """
+        try:
+            path.unlink()
+            path = path.parent
+        except PermissionError:
+            raise HttpResponseForbidden()
+
+        while path != root:
+            try:
+                path.rmdir()
+                path = path.parent
+            except PermissionError:
+                break
+            except OSError:
+                break

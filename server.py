@@ -2,6 +2,7 @@
 
 import argparse
 import mimetypes
+from pathlib import Path
 import socket
 import threading
 
@@ -44,17 +45,24 @@ class Server:
         self.__socket.close()
         self.__socket = None
 
+
+    @staticmethod
+    def get_file_path(request):
+        file_path = request.get_vhost().get_host_root_path().joinpath(request.get_path())
+        if not file_path.is_file():
+            file_path = file_path.joinpath(request.get_vhost().get_index_file())
+
+        if not file_path.exists():
+            raise HttpResponseNotFound(content="File not found")
+        return file_path
+
+
     @staticmethod
     def __get_response(request: HttpRequest) -> HttpResponse:
         response = HttpResponse()
 
         if request.get_method() == HttpMethod.GET:
-            file_path = request.get_vhost().get_host_root_path().joinpath(request.get_path())
-            if not file_path.is_file():
-                file_path = file_path.joinpath(request.get_vhost().get_index_file())
-
-            if not file_path.exists():
-                raise HttpResponseNotFound(content="File not found")
+            file_path = Server.get_file_path(request)
 
             content = Vhost.get_file_contents(file_path)
             response = HttpResponse(content=content)
@@ -70,8 +78,12 @@ class Server:
             # TODO
             pass
         elif request.get_method() == HttpMethod.DELETE:
-            # TODO
-            pass
+            # Also checks for file existence
+            file_path = Server.get_file_path(request)
+            # Deletes files and also a folder if it's empty
+            Vhost.delete_file(file_path, request.get_vhost().get_host_root_path())
+
+            
         elif request.get_method() == HttpMethod.NTW22INFO:
             # TODO
             pass
