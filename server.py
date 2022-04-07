@@ -7,11 +7,8 @@ import socket
 import threading
 
 from http.enums import HttpMethod, HttpVersion
-from http.header import HttpHeader, HEADER_CONTENT_TYPE, HEADER_CONNECTION, HEADER_CONNECTION_CLOSE
-from http.enums import HttpMethod
-from http.header import HttpHeader, HEADER_CONTENT_TYPE
-from http.header import HEADER_CONNECTION, HEADER_CONNECTION_CLOSE
-from http.header import HttpHeader, HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_TEXT_PLAIN
+from http.header import HttpHeader, HEADER_CONNECTION, HEADER_CONNECTION_CLOSE, HEADER_CONTENT_TYPE, \
+    HEADER_CONTENT_TYPE_TEXT_PLAIN
 from http.request import HttpRequest
 from http.response import HttpResponse, HttpResponseError, HttpResponseNotFound, HttpResponseUnsupportedMediaType
 from settings import DEFAULT_PORT, VHOSTS_FILE
