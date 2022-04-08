@@ -13,6 +13,7 @@ from http.request import HttpRequest
 from http.response import HttpResponse, HttpResponseError, HttpResponseMethodNotAllowed, HttpResponseNotFound, HttpResponseUnsupportedMediaType
 from settings import DEFAULT_PORT, VHOSTS_FILE
 from utils.entity import generate_output
+from utils.mime import CUSTOM_MIMETYPES
 from utils.vhosts import Vhost
 
 
@@ -66,7 +67,10 @@ class Server:
 
             content_type = mimetypes.guess_type(file_path)[0]
             if content_type is None:
-                raise HttpResponseUnsupportedMediaType()
+                extension = file_path.suffix[1:]
+                if extension not in CUSTOM_MIMETYPES:
+                    raise HttpResponseUnsupportedMediaType()
+                content_type = CUSTOM_MIMETYPES[extension]
 
             content_type_header = HttpHeader(HEADER_CONTENT_TYPE, content_type)
             response.add_header(HEADER_CONTENT_TYPE, content_type_header)
