@@ -51,11 +51,13 @@ class Server:
 
         if request.get_method() == HttpMethod.GET:
             file_path = request.get_vhost().get_host_root_path().joinpath(request.get_path())
-            if not file_path.is_file():
+            if file_path.exists() and not file_path.is_file():
                 file_path = file_path.joinpath(request.get_vhost().get_index_file())
 
             if not file_path.exists():
                 raise HttpResponseNotFound(content="File not found")
+            elif not file_path.is_file():
+                raise HttpResponseMethodNotAllowed()
 
             content = Vhost.get_file_contents(file_path)
             response = HttpResponse(content=content)
