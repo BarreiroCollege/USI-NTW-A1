@@ -115,7 +115,7 @@ class Vhost:
     @staticmethod
     def delete_file(path: Path, root: Path) -> str:
         """
-        deletes the file and then deletes the folder
+        Deletes the file and then deletes the folder
         and its parents only if they are empty
         """
         try:
