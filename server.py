@@ -6,8 +6,9 @@ import mimetypes
 import socket
 import threading
 
-from http.enums import HttpMethod
-from http.header import HttpHeader, HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_TEXT_PLAIN
+from http.enums import HttpMethod, HttpVersion
+from http.header import HttpHeader, HEADER_CONNECTION, HEADER_CONNECTION_CLOSE, HEADER_CONTENT_TYPE, \
+    HEADER_CONTENT_TYPE_TEXT_PLAIN
 from http.request import HttpRequest
 from http.response import HttpResponse, HttpResponseError, HttpResponseMethodNotAllowed, HttpResponseNotFound, HttpResponseUnsupportedMediaType
 from settings import DEFAULT_PORT, VHOSTS_FILE
@@ -26,6 +27,7 @@ class Server:
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Using the specified port
         self.__socket.bind(('', port))
+        self.__socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
         self.__socket.listen(1)
         logging.info("Server started on port {}".format(port))
 
@@ -115,10 +117,18 @@ class Server:
         out = generate_output(request, response)
         # Encode it as bytes and send it
         conn.send(bytes(out))
-        # TODO: For HTTP/1.1, if no Connection header is present or not equal to "Connection: close" (case
-        #  insensitive), this connection can NOT be closed and be open until header "Connection: close" is
-        #  received.
-        conn.close()
+
+        if request:
+            # For HTTP/1.0, we always close the connection
+            if request.get_http_version() == HttpVersion.HTTP_10:
+                conn.close()
+                return
+            # For HTTP/1.1, if "Connection: close" header is present, we also close the connection
+            if request.has_header(HEADER_CONNECTION) and request[HEADER_CONNECTION] == HEADER_CONNECTION_CLOSE:
+                conn.close()
+                return
+        # Otherwise, we keep listening for connections
+        Server.__process_connection(conn, addr)
 
 
 if __name__ == "__main__":

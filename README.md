@@ -19,5 +19,5 @@ course during the Spring Semester 2022 @ [USI Università della Svizzera italian
 | Task H             |                |            |     ●     |
 | Task I             |       ●        |     ●      |     ●     |
 | Task J             |       ●        |     ●      |     ●     |
-| _Optional Task A_  |                |            |           |
+| _Optional Task A_  |                |            |     ●     |
 | _Optional Task B_  |                |            |     ●     |
