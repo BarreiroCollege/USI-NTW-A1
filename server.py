@@ -9,7 +9,7 @@ import threading
 from http.enums import HttpMethod
 from http.header import HttpHeader, HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_TEXT_PLAIN
 from http.request import HttpRequest
-from http.response import HttpResponse, HttpResponseError, HttpResponseNotFound, HttpResponseUnsupportedMediaType
+from http.response import HttpResponse, HttpResponseError, HttpResponseMethodNotAllowed, HttpResponseNotFound, HttpResponseUnsupportedMediaType
 from settings import DEFAULT_PORT, VHOSTS_FILE
 from utils.entity import generate_output
 from utils.vhosts import Vhost
@@ -71,8 +71,15 @@ class Server:
             # TODO
             pass
         elif request.get_method() == HttpMethod.DELETE:
-            # TODO
-            pass
+            file_path = request.get_vhost().get_host_root_path().joinpath(request.get_path())
+            if not file_path.exists():
+                raise HttpResponseNotFound(content="File not found")
+
+            if not file_path.is_file():
+                raise HttpResponseMethodNotAllowed()
+            # Deletes files and also a folder if it's empty
+            Vhost.delete_file(file_path, request.get_vhost().get_host_root_path())
+
         elif request.get_method() == HttpMethod.NTW22INFO:
             ntw = "The administator of {} is {}.\nYou can contact him at {}.".format(
                 request.get_vhost().get_hostname(),
