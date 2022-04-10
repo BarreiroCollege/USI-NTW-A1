@@ -58,7 +58,7 @@ class Server:
                 file_path = file_path.joinpath(request.get_vhost().get_index_file())
 
             if not file_path.exists():
-                raise HttpResponseNotFound(content="File not found")
+                raise HttpResponseNotFound()
             elif not file_path.is_file():
                 raise HttpResponseMethodNotAllowed()
 
