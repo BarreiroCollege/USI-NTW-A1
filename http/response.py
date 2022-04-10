@@ -14,14 +14,14 @@ class HttpResponse:
     """
     __status = None
     __headers = {}
-    __content = None
+    _content = None
 
     def __init__(self,
                  status: HttpResponseCode = HttpResponseCode.OK,
                  content: str | bytes | None = None):
         # Saves the basic data (inmutable) to the class attributes
         self.__status = status
-        self.__content = content
+        self._content = content
         self.__headers = {}
 
     def get_status_code(self):
@@ -63,7 +63,7 @@ class HttpResponse:
     __delitem__ = del_header
 
     def get_content(self) -> str | bytes | None:
-        return self.__content
+        return self._content
 
     def serialize_headers(self):
         if len(self.__headers) == 0:
@@ -75,13 +75,13 @@ class HttpResponse:
 
     def serialize(self):
         # Convert to string headers with content (if present)
-        return self.serialize_headers() + '\r\n' + (str(self.__content) if self.__content is not None else '')
+        return self.serialize_headers() + '\r\n' + (str(self._content) if self._content is not None else '')
 
     def __bytes__(self):
         out = (self.serialize_headers() + '\r\n').encode(HTTP_ENCODING)
-        if self.__content is not None:
-            content = self.__content
-            if isinstance(self.__content, str):
+        if self._content is not None:
+            content = self._content
+            if isinstance(self._content, str):
                 content = content.encode(HTTP_ENCODING)
             out += content
         return out
@@ -98,10 +98,14 @@ class HttpResponseError(HttpResponse, RuntimeError):
         # If no status is given, use 500 by default
         if 'status' not in kwargs:
             kwargs['status'] = HttpResponseCode.INTERNAL_SERVER_ERROR
-        # If no content is given, get the reason explanation for the code
-        if 'content' not in kwargs:
-            kwargs['content'] = kwargs['status'].get_reason()
         super(HttpResponseError, self).__init__(*args, **kwargs)
+
+    def set_content(self, content: str | bytes | None):
+        """
+        Allow updating content in error responses only.
+        :param content: new content to be added
+        """
+        self._content = content
 
 
 # 400
