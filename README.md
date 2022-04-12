@@ -50,7 +50,7 @@ course during the Spring Semester 2022 @ [USI Università della Svizzera italian
 
 #### GET
 
-...
+Just for the commit
 
 #### PUT
 
