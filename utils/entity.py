@@ -97,7 +97,7 @@ def generate_auto_headers(request: HttpRequest, response: HttpResponse):
         # Content-Type is generated at server.py
     elif request.get_method() == HttpMethod.PUT:
         # We need Content-Location
-        # TODO: Content-Location
+        # Content-Location is generated at server.py
         pass
     elif request.get_method() == HttpMethod.DELETE:
         # We need Date
