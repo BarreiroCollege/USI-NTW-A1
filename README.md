@@ -66,9 +66,9 @@ table below. As it can be seen, multiple members have worked on the same task.
 | _Optional Task B_  |                |            |     ●     |
 
 Thus, to properly manage the project, we have used **Github** and their features to manage it as a "big" software
-project. We used **Issues** to keep track of the pending tasks, bugs found, etc.; we set up a **Milestone** to view
-the deadline and the progress done, and **Pull Requests** to independtly work on different branches to avoid breaking
-or overwriting code.
+project. We used **Issues** to keep track of the pending tasks, bugs found, etc.; we set up a **Milestone** to view the
+deadline and the progress done, and **Pull Requests** to independtly work on different branches to avoid breaking or
+overwriting code.
 
 For example, the **Issues** page looks like this right now after filtering for the specific tasks:
 
