@@ -11,19 +11,41 @@ course during the Spring Semester 2022 @ [USI Università della Svizzera italian
 
 ## Usage Instructions
 
-...
+This code has been written in **`Python 3.9`**, so it is guaranteed that no errors will appear there.
+However, lower Python versions may work properly.
 
 ### Installation
 
-...
+No specific installation instructions are required. Just install a **`Python 3`** version.
 
 ### Running
 
-...
+To get the server up and running, just run the following command:
+
+```bash
+python server.py
+```
+
+By default, it will be running at port `8080`, but it can be changed with the respective flag.
+All options are listed here:
+
+```bash
+PS C:\Github\NTW22-1> python server.py --help
+usage: server.py [-h] [-p [PORT]]
+
+HTTP server based on TCP IPv4 with multithreading support.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -p [PORT], --port [PORT]
+                        port to use to listen connections
+PS C:\Github\NTW22-1>
+```
 
 ## Tasks
 
-...
+WIP: How job was split. We used git for project management with Github issues, branches and other
+stuff as if it were a software engineering project.
 
 |                    | **Aristeidis** | **Marina** | **Diego** |
 |:-------------------|:--------------:|:----------:|:---------:|
@@ -42,28 +64,39 @@ course during the Spring Semester 2022 @ [USI Università della Svizzera italian
 
 ### Project Structure
 
-...
+WIP: Websites folder, http module, utils and server and settings.
 
 ### HTTP Implementation
 
-...
+WIP: Object oriented programming, based on Django. HttpRequest and HttpResponse. Internal process workflow:
+from getting raw socket data to sending raw socket data. Parsing and entity file (custom error content).
 
 #### GET
 
-Just for the commit
+Explain procedure regarding the implementation, logic behind it, assumptions taken, extra features, etc. Finish
+with a list of possible response codes, and their trigger case.
+Additionally, mention we support all content types, and we also return 415 error.
 
 #### PUT
 
-...
+Explain procedure regarding the implementation, logic behind it, assumptions taken, extra features, etc. Finish
+with a list of possible response codes, and their trigger case.
 
 #### DELETE
 
-...
+Explain procedure regarding the implementation, logic behind it, assumptions taken, extra features, etc. Finish
+with a list of possible response codes, and their trigger case.
+Mention as well the automatic deletion of folders.
 
 #### NTW22INFO
 
-...
+Explain procedure regarding the implementation, logic behind it, assumptions taken, extra features, etc. Finish
+with a list of possible response codes, and their trigger case.
+Mention as well that we also support other paths apart from just /.
 
 ## Acknowledgments
 
-...
+- Django
+- StackOverflow question about multithread
+- RFC's
+- TA notes
