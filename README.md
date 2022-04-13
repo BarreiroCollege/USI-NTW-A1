@@ -11,8 +11,8 @@ course during the Spring Semester 2022 @ [USI Università della Svizzera italian
 
 ## Usage Instructions
 
-This code has been written in **`Python 3.9`**, so it is guaranteed that no errors will appear there.
-However, lower Python versions may work properly.
+This code has been written in **`Python 3.9`**, so it is guaranteed that no errors will appear there. However, lower
+Python versions may work properly.
 
 ### Installation
 
@@ -26,7 +26,7 @@ To get the server up and running, just run the following command:
 python server.py
 ```
 
-By default, it will be running at port `8080`, but it can be changed with the respective flag.
+By default, it will be running at port `8080`, but it can be changed with the `--port` flag.  
 All options are listed here:
 
 ```bash
@@ -44,8 +44,8 @@ PS C:\Github\NTW22-1>
 
 ## Tasks
 
-WIP: How job was split. We used git for project management with Github issues, branches and other
-stuff as if it were a software engineering project.
+This assignment was divided into several tasks. Each member of the group worked on different tasks as stated in the
+table below. As it can be seen, multiple members have worked on the same task.
 
 |                    | **Aristeidis** | **Marina** | **Diego** |
 |:-------------------|:--------------:|:----------:|:---------:|
@@ -61,6 +61,15 @@ stuff as if it were a software engineering project.
 | Task J             |       ●        |     ●      |     ●     |
 | _Optional Task A_  |                |            |     ●     |
 | _Optional Task B_  |                |            |     ●     |
+
+Thus, to properly manage the project, we have used **Github** and their features to manage it as a "big" software
+project. We used **Issues** to keep track of the pending tasks, bugs found, etc.; we set up a **Milestone** to view
+the deadline and the progress done, and **Pull Requests** to independtly work on different branches to avoid breaking
+or overwriting code.
+
+For example, the **Issues** page looks like this right now after filtering for the specific tasks:
+
+![](https://i.imgur.com/YJgBrxT.png)
 
 ### Project Structure
 
