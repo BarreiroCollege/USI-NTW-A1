@@ -91,6 +91,7 @@ In that case we make a special response with a body of the contents of the file 
 
 #### PUT
 In the PUT method the user gives a path as an input. Then it is happening a check with try - exception with the following conditions:
+- if the input path contains at the end "/", it means that is not a file but it is a directory, so it prints the error 405 (HttpMethodNotAllowed)
 - If the input path exists then the server opens the file of that path and writes in it. 
 - If the input path does not exist then the server creats this path and this file and additionally, it prints the error 403     (HttpResponseForbidden).
 
