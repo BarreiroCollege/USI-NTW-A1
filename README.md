@@ -5,9 +5,12 @@
 **Assignment 1** for **[Computer Networking](https://search.usi.ch/en/courses/35263648/computer-networking)**
 course during the Spring Semester 2022 @ [USI Università della Svizzera italiana](https://www.usi.ch).
 
-* Aristeidis Vrazitoulis: [vrazia@usi.ch](mailto:vrazia@usi.ch)
-* Marina Papageorgiou: [papagm@usi.ch](mailto:papagm@usi.ch)
-* Diego Barreiro Perez: [barred@usi.ch](mailto:barred@usi.ch)
+* Aristeidis Vrazitoulis: [vrazia@usi.ch](mailto:vrazia@usi.ch)  
+  _Task B Website: [`arisvrazitoulis.ch`](http://arisvrazitoulis.ch:8080)_
+* Marina Papageorgiou: [papagm@usi.ch](mailto:papagm@usi.ch)  
+  _Task B Website: [`marina.ch`](http://marina.ch:8080)_
+* Diego Barreiro Perez: [barred@usi.ch](mailto:barred@usi.ch)  
+  _Task B Website: [`diegobarreiro.es`](http://diegobarreiro.es:8080)_
 
 ## Usage Instructions
 
