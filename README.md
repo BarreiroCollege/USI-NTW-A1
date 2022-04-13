@@ -89,9 +89,10 @@ More specifically:
 
 
 #### PUT
+In this method (PUT) 
 
-Explain procedure regarding the implementation, logic behind it, assumptions taken, extra features, etc. Finish
-with a list of possible response codes, and their trigger case.
+// Explain procedure regarding the implementation, logic behind it, assumptions taken, extra features, etc. Finish
+// with a list of possible response codes, and their trigger case.
 
 #### DELETE
 
@@ -105,10 +106,22 @@ After this procedure, we return a response with the suitable headers and status 
 
 
 #### NTW22INFO
+In this method (NTW22INFO) the client is giving as an input: 
+                                      "NTW22INFO / HTTP/1.0
+                                      Host: gyuincognito.ch"
 
-Explain procedure regarding the implementation, logic behind it, assumptions taken, extra features, etc. Finish
-with a list of possible response codes, and their trigger case.
-Mention as well that we also support other paths apart from just /.
+The server answers automatically: "HTTP/1.0 200 OK
+                                      Date: Wed, 24 Mar 2021 09:30:00 GMT
+                                      Server: Guy incognito's Server
+                                      Content-Length: 98
+                                      Content-Type: text/plain"   
+So my job is to write up to this input and the automatic server's answer the following answer: 
+                                      "The administrator of guyncognito.ch is Guy incognito.
+                                      The on contact him at guy.incognito@usi.ch"                                
+
+// Explain procedure regarding the implementation, logic behind it, assumptions taken, extra features, etc. Finish
+// with a list of possible response codes, and their trigger case.
+// Mention as well that we also support other paths apart from just /.
 
 ## Acknowledgments
 
