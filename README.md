@@ -73,9 +73,20 @@ from getting raw socket data to sending raw socket data. Parsing and entity file
 
 #### GET
 
-Explain procedure regarding the implementation, logic behind it, assumptions taken, extra features, etc. Finish
-with a list of possible response codes, and their trigger case.
-Additionally, mention we support all content types, and we also return 415 error.
+Since Server receives the request and checks its structure for basic validity,
+then proceeds for further checking. After inspecting the first line of the request
+and ensures that is a GET method then we check for the file path existence in the server's
+filesystem. If the requested file exists then we append its content to the body of the HTTP response
+and add the required headers to the HTTP response and 200 as status code. In every other case, we raise the corresponding exception with the corresponding status code and we attach that in the HTTP response.
+
+More specifically:
+
+-If file does not exist: 404 NOT FOUND
+-If user does not have permission to access the file: 403 FORBIDDEN
+-If the requested resource is not a file: 405 METHOD NOT ALLOWED
+#  If the file is   UnsupportedMediaType??
+
+
 
 #### PUT
 
@@ -84,9 +95,14 @@ with a list of possible response codes, and their trigger case.
 
 #### DELETE
 
-Explain procedure regarding the implementation, logic behind it, assumptions taken, extra features, etc. Finish
-with a list of possible response codes, and their trigger case.
-Mention as well the automatic deletion of folders.
+For the HTTP DELETE method we check first for the file existence. If the file exists then we delete it from the file system
+and then check if the folder is empty to remove it as well. Then we recursively check if the parent is empty so as to delete it.
+After this procedure, we return a response with the suitable headers and status code 200 OK. Otherwise we raise an exception
+
+-If file does not exist: 404 NOT FOUND
+-If user does not have permission to access the file: 403 FORBIDDEN
+-If the requested resource is not a file: 405 METHOD NOT ALLOWED
+
 
 #### NTW22INFO
 
