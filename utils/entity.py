@@ -4,10 +4,46 @@ import datetime
 import locale
 
 from http.enums import HttpVersion, HttpMethod
-from http.header import HttpHeader, HEADER_DATE, HEADER_CONTENT_LENGTH, HEADER_SERVER
+from http.header import HttpHeader, HEADER_DATE, HEADER_CONTENT_LENGTH, HEADER_SERVER, HEADER_CONTENT_TYPE, \
+    HEADER_CONTENT_TYPE_TEXT_HTML, HEADER_CONTENT_TYPE_TEXT_PLAIN
 from http.request import HttpRequest
-from http.response import HttpResponse
+from http.response import HttpResponse, HttpResponseError
 from settings import HTTP_ENCODING, SERVER_NAME
+from utils.vhosts import Vhost
+
+
+def generate_error_response_content(request: HttpRequest, response: HttpResponse):
+    """
+    If the specified request method is GET and the response is an error, try to insert the "CODE.html" file
+    as response content, if exist. Otherwise, just proceed with the reason.
+    :param request: HttpRequest object
+    :param response: HttpResponse object
+    """
+    # Only applies to GET method
+    if request.get_method() != HttpMethod.GET:
+        return
+    # And only applies to error responses
+    if not isinstance(response, HttpResponseError):
+        return
+
+    # If already specified some content, ignore
+    if response.get_content() is not None:
+        return
+
+    # Search for CODE.html file and, if exists and is file, put such contents as response
+    error_file_path = request.get_vhost().get_host_root_path().joinpath(
+        "{}.html".format(str(response.get_status_code().get_code()))
+    )
+    if error_file_path.exists() and error_file_path.is_file():
+        content = Vhost.get_file_contents(error_file_path)
+        content_type_header = HttpHeader(HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_TEXT_HTML)
+    else:
+        content = response.get_status_code().get_reason()
+        content_type_header = HttpHeader(HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_TEXT_PLAIN)
+
+    # Update the response content and Content-Type header
+    response.set_content(content)
+    response[HEADER_CONTENT_TYPE] = content_type_header
 
 
 def generate_header_server(response: HttpResponse):
@@ -81,6 +117,8 @@ def generate_output(request: HttpRequest | None, response: HttpResponse) -> byte
     :return: valid HTTP response string
     """
     if request:
+        # Check if the specified response is an error and, if is, try to inject the output
+        generate_error_response_content(request, response)
         # If we receive a valid request, then try to generate the needed headers automatically
         generate_auto_headers(request, response)
     # Generate the response-line and append the response serialization (headers and body) afterwards

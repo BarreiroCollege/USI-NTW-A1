@@ -102,7 +102,7 @@ class Vhost:
         return "{}({})".format(self.__hostname, self.__email)
 
     @staticmethod
-    def get_file_contents(path: Path) -> str:
+    def get_file_contents(path: Path) -> bytes:
         try:
             with open(path, mode='rb') as f:
                 return f.read()        
@@ -110,10 +110,9 @@ class Vhost:
             raise HttpResponseNotFound()
         except PermissionError:
             raise HttpResponseForbidden()
-    
-    
+
     @staticmethod
-    def delete_file(path: Path, root: Path) -> str:
+    def delete_file(path: Path, root: Path):
         """
         Deletes the file and then deletes the folder
         and its parents only if they are empty
