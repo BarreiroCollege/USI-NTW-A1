@@ -76,7 +76,97 @@ For example, the **Issues** page looks like this right now after filtering for t
 
 ### Project Structure
 
-WIP: Websites folder, http module, utils and server and settings.
+NOTE: _All the project has been created following an object-oriented pattern to ease operations. Some of these classes
+override basic Python operations (like `__bytes__` or `__setitem__`), so code can be written clearer._
+
+As required, **`server.py` file is the entry point**. It is actually the only executable file (the rest Python files
+are just modules, and will not run anything unless invoked from a different file). Thus, such file must be run as a
+Python script (and will not do anything if imported from a module). This file has the `Server` class, which actually
+keeps the server socket alive and parses the `Vhost` file (one object per virtual host). It will start listening for
+connections and, **for each connection, will process it in a new thread**.
+
+The `settings.py` file defines some constants for the server, like the default running port (`8080`), the encoding
+(`utf-8`) to keep all request uniform, the **server name (`Group AMD Server`)** and the virtual hosts file
+(`vhost.confs`).
+
+Task B websites are available in the respective folders (`arisvrazitoulis.ch`, `marina.ch`, `diegobarreiro.es`), as
+well as the virtual hosts file (`vhosts.conf`).
+
+The **`http` module** takes care of creating the response and request objects. **`HttpRequest` class will be constructed
+from a raw HTTP request**, containing all the data inside the respective attributes. And then **`HttpResponse` will
+contain all the data** for the output response, which can be **serialized into a raw HTTP response** (in this case,
+some subclasses have been defined for the error codes to ease its usage). `enums.py` file contains several available
+constants, like **`HttpMethod`**, **`HttpResponseCode`** and **`HttpVersion`** (which are used in the request and
+response objects). And it has been defined a **`HttpHeader` class as a key-value standarized header**.
+
+And finally, the **`utils` module** takes care of other minor tasks. **`entity.py`** file will generate the raw HTTP
+response from both request and response (from an OOP perspective, response could receive the request, but it would
+create a dependency between these objects which, in theory, are independent, as the response object "only" varies in
+status code, headers and body), and it will also inject some auto independent headers like `Content-Length` or `Date`.
+The `mime.py` file defines some custom MIME types for the `GET` method (_this is explained later_). And finally the
+**`vhosts.py`** file which contains the `Vhost` class with the attributes of a virtual host.
+
+```txt
+NTW22-1
+├── README.md
+├── arisvrazitoulis.ch
+│   ├── giannena.jpeg
+│   ├── index.html
+│   └── me.jpg
+├── diegobarreiro.es
+│   ├── 404.html
+│   ├── about.html
+│   ├── assets
+│   │   ├── css
+│   │   │   └── features.css
+│   │   ├── img
+│   │   │   ├── etse.jpg
+│   │   │   ├── home.jpg
+│   │   │   ├── ies1.jpg
+│   │   │   ├── ies2.jpg
+│   │   │   ├── ies3.jpg
+│   │   │   ├── mit1.jpg
+│   │   │   ├── mit2.jpg
+│   │   │   ├── pc1.png
+│   │   │   └── pc2.jpg
+│   │   ├── js
+│   │   ├── vendor
+│   │   │   ├── bootstrap-5.1.3
+│   │   │   └── bootstrap-icons-1.8.1
+│   │   └── video
+│   │       └── kodular.mp4
+│   ├── contact.html
+│   ├── edu.html
+│   ├── favicon.ico
+│   └── work.html
+├── guyincognito.ch
+│   ├── home.html
+│   ├── images
+│   │   ├── avatar.png
+│   │   ├── paddlin.png
+│   │   ├── pglit2.gif
+│   │   └── under_construction.gif
+│   └── test
+├── http
+│   ├── enums.py
+│   ├── header.py
+│   ├── request.py
+│   └── response.py
+├── marina.ch
+│   ├── images
+│   │   ├── 1.jpeg
+│   │   ├── 2.jpeg
+│   │   └── 3.jpeg
+│   ├── index.html
+│   └── style.css
+├── server.py
+├── settings.py
+├── utils
+│   ├── entity.py
+│   ├── mime.py
+│   └── vhosts.py
+└── vhosts.conf
+```
 
 ### HTTP Implementation
 
