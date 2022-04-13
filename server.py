@@ -9,7 +9,7 @@ import threading
 
 from http.enums import HttpMethod, HttpResponseCode, HttpVersion
 from http.header import HttpHeader, HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_TEXT_PLAIN, HEADER_CONNECTION, \
-    HEADER_CONNECTION_CLOSE
+    HEADER_CONNECTION_CLOSE, HEADER_CONTENT_LOCATION
 from http.request import HttpRequest
 from http.response import HttpResponse, HttpResponseError, HttpResponseMethodNotAllowed, HttpResponseNotFound, \
     HttpResponseUnsupportedMediaType, HttpResponseForbidden
@@ -92,6 +92,9 @@ class Server:
                 raise HttpResponseForbidden()
 
             response = HttpResponse(status=HttpResponseCode.CREATED)
+
+            content_location_header = HttpHeader(HEADER_CONTENT_LOCATION, request.get_path())
+            response.add_header(HEADER_CONTENT_LOCATION, content_location_header)
 
         elif request.get_method() == HttpMethod.DELETE:
             file_path = request.get_vhost().get_host_root_path().joinpath(request.get_path())
