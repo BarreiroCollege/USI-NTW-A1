@@ -76,28 +76,29 @@ For example, the **Issues** page looks like this right now after filtering for t
 
 ### Project Structure
 
-NOTE: _All the project has been created following an object-oriented pattern to ease operations. Some of these classes
+_All the project has been created following an object-oriented pattern to ease operations. Some of these classes
 override basic Python operations (like `__bytes__` or `__setitem__`), so code can be written clearer._
 
-As required, **`server.py` file is the entry point**. It is actually the only executable file (the rest Python files
-are just modules, and will not run anything unless invoked from a different file). Thus, such file must be run as a
-Python script (and will not do anything if imported from a module). This file has the `Server` class, which actually
-keeps the server socket alive and parses the `Vhost` file (one object per virtual host). It will start listening for
-connections and, **for each connection, will process it in a new thread**.
+As required, **`server.py` file is the entry point**. It is actually the only executable file (the rest Python files are
+just modules, and will not run anything unless invoked from a different file). Thus, such file must be run as a Python
+script (and will not do anything if imported from a module). This file has the `Server` class, which actually keeps the
+server socket alive and parses the `Vhost` file (one object per virtual host). It will start listening for connections
+and, **for each connection, will process it in a new thread**.
 
 The `settings.py` file defines some constants for the server, like the default running port (`8080`), the encoding
 (`utf-8`) to keep all request uniform, the **server name (`Group AMD Server`)** and the virtual hosts file
 (`vhost.confs`).
 
-Task B websites are available in the respective folders (`arisvrazitoulis.ch`, `marina.ch`, `diegobarreiro.es`), as
-well as the virtual hosts file (`vhosts.conf`).
+Task B websites are available in the respective folders (`arisvrazitoulis.ch`, `marina.ch`, `diegobarreiro.es`), as well
+as the virtual hosts file (`vhosts.conf`).
 
 The **`http` module** takes care of creating the response and request objects. **`HttpRequest` class will be constructed
 from a raw HTTP request**, containing all the data inside the respective attributes. And then **`HttpResponse` will
-contain all the data** for the output response, which can be **serialized into a raw HTTP response** (in this case,
-some subclasses have been defined for the error codes to ease its usage). `enums.py` file contains several available
-constants, like **`HttpMethod`**, **`HttpResponseCode`** and **`HttpVersion`** (which are used in the request and
-response objects). And it has been defined a **`HttpHeader` class as a key-value standarized header**.
+contain all the data** for the output response, which can be **serialized into a raw HTTP response** (in this case, some
+subclasses have been defined for the error codes to ease its usage which extend `Exception`, allowing to be raised and
+later caught by the `Server` to be sent as "valid" responses). `enums.py` file contains several available constants,
+like **`HttpMethod`**, **`HttpResponseCode`** and **`HttpVersion`** (which are used in the request and response
+objects). And it has been defined a **`HttpHeader` class as a key-value standarized header**.
 
 And finally, the **`utils` module** takes care of other minor tasks. **`entity.py`** file will generate the raw HTTP
 response from both request and response (from an OOP perspective, response could receive the request, but it would
@@ -170,8 +171,38 @@ NTW22-1
 
 ### HTTP Implementation
 
-WIP: Object oriented programming, based on Django. HttpRequest and HttpResponse. Internal process workflow:
-from getting raw socket data to sending raw socket data. Parsing and entity file (custom error content).
+The first step of the HTTP process is **generating the `HttpRequest` object**. Upon receiving a new connection, `Server`
+will launch a new thread to start processing this new request (such thread will keep listening for connections in
+`HTTP/1.1` if `Connection: Close` is not present). This new thread will call the constructor for `HttpRequest`, sending
+the raw bytes in the socket. The constructor will try to parse this HTTP request, considering the breakline as `CRLF`.
+If no errors are found, the `HttpRequest` object will be created. The following errors may be triggered (in the
+specified priority), and will raise the corresponding error breaking the procedure and returning the HTTP response
+earlier:
+
+| **Status Code** | **Class**                             | **Reason**                                          |
+|:---------------:|:--------------------------------------|:----------------------------------------------------|
+|     **501**     | `HttpResponseNotImplemented`          | Specified request method is not implemented         |
+|     **505**     | `HttpResponseHttpVersionNotSupported` | Not `HTTP/1.0` or `HTTP/1.1`                        |
+|     **403**     | `HttpResponseForbidden`               | Specified path is outside of the virtual host scope |
+|     **404**     | `HttpResponseNotFound`                | Specified host is not available in the server       |
+|     **400**     | `HttpResponseBadRequest`              | Error parsing the request (_malformed data_)        |
+
+Once the `HttpRequest` object is generated, the next step is generating the appropiate response for such request. So,
+back into the **`Server` object**, it **will generate the `HttpResponse` object for such request**. Depending on the
+method, different code is executed, so _this part is better explained in the sections below for each method_. Keep in
+mind that some errors can appear when generating the response as well, so a similar table as the one above will be
+present for each method.
+
+And finally, now that both `HttpRequest` and `HttpResponse` objects are created, **they are ready to be "merged" into
+the raw output** for the socket to be sent to the client. Thus, `entity.py` will receive both objects and start
+generating this string, and will also **inject some "auto" headers into the response object**. These headers include
+`Date` or `Server`, for example. The return data is the **actual string encoded in bytes** that has to be sent back to
+the client as response.
+
+Additionally, a **custom error page feature has been implemented**. In the root of a virtual host folder, files named
+`CODE.html` can be created, where `CODE` is an `HTTP` error code. When `entity.py` detects that response is an error
+response, if no content is specified and `GET` method has been requested, it will **try to search for such file and put
+it as response content**. This is pretty useful for cases like designing custom not found pages, or other error pages.
 
 #### GET
 
