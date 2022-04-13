@@ -80,8 +80,9 @@ filesystem. If the requested file exists then we append its content to the body 
 and add the required headers to the HTTP response and 200 as status code. In every other case, we raise the corresponding exception with the corresponding status code and we attach that in the HTTP response.
 
 More specifically:
-
 -If file does not exist: 404 NOT FOUND
+In that case we make a special response with a body of the contents of the file 404.html 
+
 -If user does not have permission to access the file: 403 FORBIDDEN
 -If the requested resource is not a file: 405 METHOD NOT ALLOWED
 #  If the file is   UnsupportedMediaType??
