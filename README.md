@@ -251,22 +251,30 @@ After this procedure, we return a response with the suitable headers and status 
 
 
 #### NTW22INFO
-In this method (NTW22INFO) the client is giving as an input: 
-                                      "NTW22INFO / HTTP/1.0
-                                      Host: gyuincognito.ch"
 
-The server answers automatically: "HTTP/1.0 200 OK
-                                      Date: Wed, 24 Mar 2021 09:30:00 GMT
-                                      Server: Guy incognito's Server
-                                      Content-Length: 98
-                                      Content-Type: text/plain"   
-So my job is to write up to this input and the automatic server's answer the following answer: 
-                                      "The administrator of guyncognito.ch is Guy incognito.
-                                      The on contact him at guy.incognito@usi.ch"                                
+This method generates a **static response**. It does not really depend on the request: output is always a constant.
+Thus, for all paths, a request would look like the following one:
 
-// Explain procedure regarding the implementation, logic behind it, assumptions taken, extra features, etc. Finish
-// with a list of possible response codes, and their trigger case.
-// Mention as well that we also support other paths apart from just /.
+```http request
+NTW22INFO / HTTP/1.0
+Host: gyuincognito.ch
+```
+
+And the response will look like this:
+
+```http response
+HTTP/1.0 200 OK
+Date: Wed, 24 Mar 2021 09:30:00 GMT
+Server: Guy incognito's Server
+Content-Length: 98
+Content-Type: text/plain
+
+The administator of guyncognito.ch is Guy incognito.
+You can contact him at guy.incognito@usi.ch.
+```
+
+The only variables are in the content of the response, which **depends on the virtual host** the user is trying to
+access. It is not possible to get an error in this method.
 
 ## Acknowledgments
 
