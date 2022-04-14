@@ -217,7 +217,8 @@ checked if it **exists or not in the filesystem**. And, if it exists, check that
 Finally, we can try to **open the file** (assuming we have permission to do so), and **get its contents in bytes**. Now
 the **`HttpResponse` object gets constructed, with the specified content**. However, before it becomes a valid response,
 the MIME type of such file has to be checked. `Server` will try to guess its type using the standard `mimetypes`
-library and, if it cannot get resolved with either the library or the custom ones, an error will be raised.
+library and, if it cannot get resolved with either the library or the custom ones, an error will be raised. It is
+worth mentioning that **hundreds of file types are supported, from several image formats to video and other types**.
 
 The list of error responses that this method can return are the following ones (with the given priority):
 
