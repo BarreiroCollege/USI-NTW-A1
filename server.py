@@ -52,69 +52,90 @@ class Server:
 
     @staticmethod
     def __get_response(request: HttpRequest) -> HttpResponse:
+        # Create an initial response, so at least there is one always
         response = HttpResponse()
 
         if request.get_method() == HttpMethod.GET:
             file_path = request.get_vhost().get_host_root_path().joinpath(request.get_path())
+            # If user is requesting an existing path, try to access the index file
             if file_path.exists() and not file_path.is_file():
                 file_path = file_path.joinpath(request.get_vhost().get_index_file())
 
+            # If file does not exist, then 404
             if not file_path.exists():
                 raise HttpResponseNotFound()
+            # And if it is a folder, then 405
             elif not file_path.is_file():
                 raise HttpResponseMethodNotAllowed()
 
+            # Try to get file contents
             content = Vhost.get_file_contents(file_path)
             response = HttpResponse(content=content)
 
+            # Try to guess the content type from the MIME type
             content_type = mimetypes.guess_type(file_path)[0]
             if content_type is None:
+                # If no content type, check if it is one of the manually defined ones
                 extension = file_path.suffix[1:]
                 if extension not in CUSTOM_MIMETYPES:
+                    # If still cannot find the content type, raise error 415
                     raise HttpResponseUnsupportedMediaType()
                 content_type = CUSTOM_MIMETYPES[extension]
 
+            # Add the Content-Type header
             content_type_header = HttpHeader(HEADER_CONTENT_TYPE, content_type)
             response.add_header(HEADER_CONTENT_TYPE, content_type_header)
 
         elif request.get_method() == HttpMethod.PUT:
+            # It is not possible to PUT to a folder so, if it is one, just raise 405
             if request.get_path().endswith("/"):
                 raise HttpResponseMethodNotAllowed()
 
+            # Get the file to remove, and the parent one (create these folders recursively)
             file_path = request.get_vhost().get_host_root_path().joinpath(request.get_path())
             folder_path = file_path.parent
 
             try:
+                # Create all folders up to the file
                 os.makedirs(folder_path, exist_ok=True)
-                with open(file_path, "w") as f:
-                    f.write(request.get_body())
+                # Open file and write contents to it
+                Vhost.put_file_contents(file_path, request.get_body())
             except PermissionError:
                 raise HttpResponseForbidden()
 
+            # Use 201 as response code
             response = HttpResponse(status=HttpResponseCode.CREATED)
 
+            # And specify where such file has been created
             content_location_header = HttpHeader(HEADER_CONTENT_LOCATION, request.get_path())
             response.add_header(HEADER_CONTENT_LOCATION, content_location_header)
 
         elif request.get_method() == HttpMethod.DELETE:
+            # This method is strict, which means that it will only strictly delete the file if it exists
             file_path = request.get_vhost().get_host_root_path().joinpath(request.get_path())
             if not file_path.exists():
                 raise HttpResponseNotFound(content="File not found")
 
+            # If file is not a file, raise error 405 because it means it is a non-empty folder (as per the current
+            # implementation, it is impossible that at this point empty folders exist)
             if not file_path.is_file():
                 raise HttpResponseMethodNotAllowed()
-            # Deletes files and also a folder if it's empty
+
+            # Deletes the file and also the parent folders if they are empty
             Vhost.delete_file(file_path, request.get_vhost().get_host_root_path())
 
         elif request.get_method() == HttpMethod.NTW22INFO:
+            # Specify the format of the output string
             ntw = "The administator of {} is {}.\nYou can contact him at {}.".format(
                 request.get_vhost().get_hostname(),
                 request.get_vhost().get_server_admin_name(),
                 request.get_vhost().get_server_admin_email()
             )
 
+            # Create the response
             response = HttpResponse(content=ntw)
 
+            # And use plain text as response content
             content_type_header = HttpHeader(HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_TEXT_PLAIN)
             response.add_header(HEADER_CONTENT_TYPE, content_type_header)
 
