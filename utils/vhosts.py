@@ -103,31 +103,59 @@ class Vhost:
 
     @staticmethod
     def get_file_contents(path: Path) -> bytes:
+        """
+        Tries to get file contents in bytes.
+        :param path: file to open
+        :return: file contents encoded in bytes
+        """
         try:
+            # Open in binary mode
             with open(path, mode='rb') as f:
                 return f.read()        
         except FileNotFoundError:
+            # If file does not exist (should never reach here), then 404
             raise HttpResponseNotFound()
+        except PermissionError:
+            # If no permission to open the file, then 403
+            raise HttpResponseForbidden()
+
+    @staticmethod
+    def put_file_contents(path: Path, content: str):
+        """
+        Put the specified content into a file (parent folders must exist)
+        :param path: file to be written
+        :param content: data to write
+        """
+        try:
+            with open(path, "w") as f:
+                f.write(content)
         except PermissionError:
             raise HttpResponseForbidden()
 
     @staticmethod
     def delete_file(path: Path, root: Path):
         """
-        Deletes the file and then deletes the folder
-        and its parents only if they are empty
+        Deletes the file and then deletes the folder and its parents only if they are empty.
+        :param path: path of the file to be deleted
+        :param root: root of the virtual host
         """
         try:
+            # Try to remove the file and, to also delete the empty folders, go to the parent
             path.unlink()
             path = path.parent
         except PermissionError:
+            # If no permission, then raise exception
             raise HttpResponseForbidden()
 
+        # Only stop when the folder to try to remove is the virtual host one
         while path != root:
             try:
+                # Try to remove all empty folders, parent after parent
                 path.rmdir()
                 path = path.parent
             except PermissionError:
+                # If no permission to delete the folder, don't do anything (we don't care if we cannot delete an
+                # empty folder)
                 break
             except OSError:
                 break
