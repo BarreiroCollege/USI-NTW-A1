@@ -12,6 +12,8 @@ course during the Spring Semester 2022 @ [USI Università della Svizzera italian
 * Diego Barreiro Perez: [barred@usi.ch](mailto:barred@usi.ch)  
   _Task B Website: [`diegobarreiro.es`](http://diegobarreiro.es:8080)_
 
+_All code is properly documented with extensive inline and definition comments._
+
 ## Usage Instructions
 
 This code has been written in **`Python 3.9`**, so it is guaranteed that no errors will appear there. However, lower
@@ -303,6 +305,7 @@ access. It is not possible to get an error in this method.
 
 - Lecture Notes _by Professor Silvia Santini_
 - Assignment Description _by Matias Laporte_
+- Server Code Samples _by Professor Antonio Carzaniga_
 - [RFC1945](https://datatracker.ietf.org/doc/html/rfc1945) - HTTP/1.0
 - [RFC2616](https://datatracker.ietf.org/doc/html/rfc2616) - HTTP/1.1
 - [Multithread Socket Server - Stack Overflow](https://stackoverflow.com/a/23828265)
