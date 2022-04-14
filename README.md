@@ -241,14 +241,26 @@ In the PUT method the user gives a path as an input. Then it is happening a chec
 
 #### DELETE
 
-For the HTTP DELETE method we check first for the file existence. If the file exists then we delete it from the file system
-and then check if the folder is empty to remove it as well. Then we recursively check if the parent is empty so as to delete it.
-After this procedure, we return a response with the suitable headers and status code 200 OK. Otherwise we raise an exception
+This method will be **very strict** (not like `GET` which could be more lax regarding which file is accessing). This is
+implemented like this to prevent unintended changes in the filesystem. In other words, it will not try to guess with
+index files which file the user is trying to delete.
 
--If file does not exist: 404 NOT FOUND
--If user does not have permission to access the file: 403 FORBIDDEN
--If the requested resource is not a file: 405 METHOD NOT ALLOWED
+The first step is to **check if the specified file exists in the filesystem**. If it does not exist, then there is no
+need to proceed further. If it does, then it is needed to **confirm that such "file" is a file and not a folder**.
 
+And finally, **try to delete the file** (and **recursively the parent folders if they are empty**). Note that only the
+permission will be checked to delete the file, not the parent folders.
+
+The list of error responses that this method can return are the following ones (with the given priority):
+
+| **Status Code** | **Class**                          | **Reason**                                                  |
+|:---------------:|:-----------------------------------|:------------------------------------------------------------|
+|     **404**     | `HttpResponseNotFound`             | Specified file (or folder) does not exist                   |
+|     **405**     | `HttpResponseMethodNotAllowed`     | Specified "file" path is a folder in the filesystem         |
+|     **403**     | `HttpResponseForbidden`            | Cannot delete file (missing filesystem permissions)         |
+|     **415**     | `HttpResponseUnsupportedMediaType` | File exists but its MIME type cannot be guessed             |
+
+If no error appears, **`HttpResponse` will have code `200 OK` and empty body**.
 
 #### NTW22INFO
 
