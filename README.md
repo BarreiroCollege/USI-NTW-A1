@@ -231,13 +231,23 @@ The list of error responses that this method can return are the following ones (
 If no error appears, **`HttpResponse` will have code `200 OK` and as body the contents of such file**.
 
 #### PUT
-In the PUT method the user gives a path as an input. Then it is happening a check with try - exception with the following conditions:
-- if the input path contains at the end "/", it means that is not a file but it is a directory, so it prints the error 405 (HttpMethodNotAllowed)
-- If the input path exists then the server opens the file of that path and writes in it. 
-- If the input path does not exist then the server creats this path and this file and additionally, it prints the error 403     (HttpResponseForbidden).
 
-// Explain procedure regarding the implementation, logic behind it, assumptions taken, extra features, etc. Finish
-// with a list of possible response codes, and their trigger case.
+The first step in this method is to **check if the specified request path is a folder or not** (ending with `/`). It
+has to be checked before because the specified path does not require to exist and, consequently, we cannot write data
+into a non-file node. Then, if the specified **list of parent folders do not exist, create all of them** (being aware of
+possible permission errors).
+
+And finally, **put the request body into the specified file**, and **add the `Content-Location` header** (which matches
+the request path attribute, as we are strict regarding the file to write).
+
+The list of error responses that this method can return are the following ones (with the given priority):
+
+| **Status Code** | **Class**                          | **Reason**                                          |
+|:---------------:|:-----------------------------------|:----------------------------------------------------|
+|     **405**     | `HttpResponseMethodNotAllowed`     | Specified "file" path is a folder in the filesystem |
+|     **403**     | `HttpResponseForbidden`            | Cannot create either parent folders or file node    |
+
+If no error appears, **`HttpResponse` will have code `201 CREATED` and empty body**.
 
 #### DELETE
 
