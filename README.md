@@ -97,8 +97,8 @@ from a raw HTTP request**, containing all the data inside the respective attribu
 contain all the data** for the output response, which can be **serialized into a raw HTTP response** (in this case, some
 subclasses have been defined for the error codes to ease its usage which extend `Exception`, allowing to be raised and
 later caught by the `Server` to be sent as "valid" responses). `enums.py` file contains several available constants,
-like **`HttpMethod`**, **`HttpResponseCode`** and **`HttpVersion`** (which are used in the request and response
-objects). And it has been defined a **`HttpHeader` class as a key-value standarized header**.
+like **`HttpMethod`**, **`HttpResponseCode`** and **`HttpVersion`** (which are used in the request and response objects)
+. And it has been defined a **`HttpHeader` class as a key-value standarized header**.
 
 And finally, the **`utils` module** takes care of other minor tasks. **`entity.py`** file will generate the raw HTTP
 response from both request and response (from an OOP perspective, response could receive the request, but it would
@@ -206,21 +206,29 @@ it as response content**. This is pretty useful for cases like designing custom 
 
 #### GET
 
-Since Server receives the request and checks its structure for basic validity,
-then proceeds for further checking. After inspecting the first line of the request
-and ensures that is a GET method then we check for the file path existence in the server's
-filesystem. If the requested file exists then we append its content to the body of the HTTP response
-and add the required headers to the HTTP response and 200 as status code. In every other case, we raise the corresponding exception with the corresponding status code and we attach that in the HTTP response.
+The first step is to check if the provided path is a folder or not. As a `Vhost` specifies an index file, **if the user
+tries to access a folder, they are in fact trying to access to the index file of such folder**. So, it has to be
+appended.
 
-More specifically:
--If file does not exist: 404 NOT FOUND
-In that case we make a special response with a body of the contents of the file 404.html 
+The next steps is to check if the specified file exists in the filesystem. `Vhost` already provides a method to get the
+`Path` of the root for its files, so the **request path has to be appended to this path**. Once done, the file can be
+checked if it **exists or not in the filesystem**. And, if it exists, check that **is not a folder**.
 
--If user does not have permission to access the file: 403 FORBIDDEN
--If the requested resource is not a file: 405 METHOD NOT ALLOWED
-#  If the file is   UnsupportedMediaType??
+Finally, we can try to **open the file** (assuming we have permission to do so), and **get its contents in bytes**. Now
+the **`HttpResponse` object gets constructed, with the specified content**. However, before it becomes a valid response,
+the MIME type of such file has to be checked. `Server` will try to guess its type using the standard `mimetypes`
+library and, if it cannot get resolved with either the library or the custom ones, an error will be raised.
 
+The list of error responses that this method can return are the following ones (with the given priority):
 
+| **Status Code** | **Class**                          | **Reason**                                                 |
+|:---------------:|:-----------------------------------|:-----------------------------------------------------------|
+|     **404**     | `HttpResponseNotFound`             | Specified file (or folder) does not exist                  |
+|     **405**     | `HttpResponseMethodNotAllowed`     | Specified "file" path is a folder in the filesystem        |
+|     **403**     | `HttpResponseForbidden`            | Cannot read file contents (missing filesystem permissions) |
+|     **415**     | `HttpResponseUnsupportedMediaType` | File exists but its MIME type cannot be guessed            |
+
+If no error appears, **`HttpResponse` will have code `200 OK` and as body the contents of such file**.
 
 #### PUT
 In the PUT method the user gives a path as an input. Then it is happening a check with try - exception with the following conditions:
