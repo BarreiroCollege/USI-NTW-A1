@@ -262,7 +262,9 @@ So my job is to write up to this input and the automatic server's answer the fol
 
 ## Acknowledgments
 
-- Django
-- StackOverflow question about multithread
-- RFC's
-- TA notes
+- Lecture Notes _by Professor Silvia Santini_
+- Assignment Description _by Matias Laporte_
+- [RFC1945](https://datatracker.ietf.org/doc/html/rfc1945) - HTTP/1.0
+- [RFC2616](https://datatracker.ietf.org/doc/html/rfc2616) - HTTP/1.1
+- [Multithread Socket Server - Stack Overflow](https://stackoverflow.com/a/23828265)
+- [Django Project](https://www.djangoproject.com/)
