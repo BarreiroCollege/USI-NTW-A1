@@ -126,7 +126,7 @@ class Server:
 
         elif request.get_method() == HttpMethod.NTW22INFO:
             # Specify the format of the output string
-            ntw = "The administator of {} is {}.\nYou can contact him at {}.".format(
+            ntw = "The administrator of {} is {}.\nYou can contact him at {}.".format(
                 request.get_vhost().get_hostname(),
                 request.get_vhost().get_server_admin_name(),
                 request.get_vhost().get_server_admin_email()
