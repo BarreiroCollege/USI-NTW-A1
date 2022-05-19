@@ -120,14 +120,14 @@ class Vhost:
             raise HttpResponseForbidden()
 
     @staticmethod
-    def put_file_contents(path: Path, content: str):
+    def put_file_contents(path: Path, content: bytes):
         """
         Put the specified content into a file (parent folders must exist)
         :param path: file to be written
         :param content: data to write
         """
         try:
-            with open(path, "w") as f:
+            with open(path, "wb") as f:
                 f.write(content)
         except PermissionError:
             raise HttpResponseForbidden()

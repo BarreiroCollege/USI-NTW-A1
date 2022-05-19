@@ -211,8 +211,8 @@ class HttpRequest:
 
         if expected_length != actual_length:
             raise HttpResponseBadRequest(content="Request body differs from the specified Content-Length value")
-        # And save the body data
-        self.__body = body
+        # And save the body data as binary
+        self.__body = body.encode(HTTP_ENCODING)
 
     def get_method(self) -> HttpMethod:
         return self.__method
@@ -229,7 +229,7 @@ class HttpRequest:
     def get_vhost(self) -> Vhost:
         return self.__vhost
 
-    def get_body(self) -> str | None:
+    def get_body(self) -> bytes | None:
         return self.__body
 
     def has_header(self, name: str):
